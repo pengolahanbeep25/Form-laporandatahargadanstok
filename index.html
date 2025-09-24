@@ -251,29 +251,28 @@
   // Kirim ke Google Apps Script
   const form = document.getElementById("dataForm");
 
-  form.addEventListener("submit", async function(e) {
-    e.preventDefault();
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-    const formData = new FormData(form);
-    let data = {};
-    formData.forEach((value, key) => data[key] = value);
+  const formData = new FormData(form);
 
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbwa2jV6FmQvWuvjxJoyGTPKd7BTjfxRqIdGwbg5myBtZTHDZLnw_IXZX7b7krRpUTJWSQ/exec", {
-        method: "POST",
-        mode: "no-cors",   // wajib biar request bisa jalan
-        body: JSON.stringify(data)
-      });
+  try {
+    let res = await fetch("https://script.google.com/macros/s/AKfycbwRucDgSwLenBAfNycremHBCF_INCzbmhfiimAeo3_K7G_8wFriImj0fWHzB_0n_pbODw/exec", {
+      method: "POST",
+      body: formData
+    });
 
-      alert("✅ Data berhasil dikirim ke Spreadsheet!");
-      form.reset();
-    } catch (err) {
-      alert("❌ Gagal menyimpan data: " + err);
-    }
-  });
+    let result = await res.json();
+    alert(result.message || "✅ Data berhasil dikirim ke Spreadsheet!");
+    form.reset();
+  } catch (err) {
+    alert("❌ Gagal menyimpan data: " + err);
+  }
+});
 </script>
 </body>
 </html>
+
 
 
 
