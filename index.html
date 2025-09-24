@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Input Data Gabah & Beras</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+    .overlay {
+      background: rgba(255,255,255,0.9);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .kop {
+      display: flex;
+      align-items: center;
+      border-bottom: 3px solid #2d6a4f;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .kop img {
+      height: 90px;
+      margin-right: 20px;
+    }
+    .kop-text {
+      flex: 1;
+      text-align: center;
+    }
+    .kop-text h2, .kop-text h3, .kop-text p {
+      margin: 2px;
+      line-height: 1.4;
+    }
+    .kop-text h2 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1b4332;
+    }
+    .kop-text h3 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2d6a4f;
+    }
+    .form-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .form-section h4 {
+      margin-top: 0;
+      color: #1b4332;
+      border-left: 5px solid #2d6a4f;
+      padding-left: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    input[readonly] {
+      background: #f1f1f1;
+    }
+    small {
+      font-size: 12px;
+      color: #555;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: #2d6a4f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1b4332;
+    }
+    @media(max-width:600px) {
+      .kop {
+        flex-direction: column;
+        text-align: center;
+      }
+      .kop img {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="overlay">
+
+  <!-- KOP DINAS -->
+  <div class="kop">
+    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-small.png" alt="Logo">
+    <div class="kop-text">
+      <h2>PEMERINTAH KABUPATEN INDRAGIRI HILIR</h2>
+      <h3>DINAS PANGAN, TANAMAN PANGAN, HORTIKULTURA DAN PETERNAKAN</h3>
+      <p>Jalan Pangeran Diponegoro No.50 Tembilahan Kode Pos 29212</p>
+      <p>Telepon (0768) 21094, Fax (0768) 325516</p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <form id="dataForm">
+    <!-- Identitas -->
+    <div class="form-section">
+      <h4>Identitas Pelapor</h4>
+      <label>Nama Petani/Pelapor:</label>
+      <input type="text" name="nama" required>
+
+      <label>Kecamatan:</label>
+      <input type="text" name="kecamatan" required>
+
+      <label>Desa/Kelurahan:</label>
+      <input type="text" name="desa" required>
+    </div>
+
+    <!-- Gabah Kering Panen -->
+    <div class="form-section">
+      <h4>Gabah Kering Panen (GKP)</h4>
+      <label>Stok Hari ini:</label>
+      <input type="number" name="stok_gkp">
+
+      <label>Kadar Air (%):</label>
+      <input type="number" name="kadarair_gkp">
+
+      <label>Harga Petani (Rp):</label>
+      <input type="number" name="harga_petani_gkp">
+
+      <label>Harga Penggilingan (Rp):</label>
+      <input type="number" name="harga_pg_gkp">
+    </div>
+
+    <!-- Gabah Kering Giling -->
+    <div class="form-section">
+      <h4>Gabah Kering Giling (GKG)</h4>
+      <label>Stok Hari ini:</label>
+      <input type="number" name="stok_gkg">
+
+      <label>Kadar Air (%):</label>
+      <input type="number" name="kadarair_gkg">
+
+      <label>Harga Petani (Rp):</label>
+      <input type="number" name="harga_petani_gkg">
+
+      <label>Harga Penggilingan (Rp):</label>
+      <input type="number" name="harga_pg_gkg">
+    </div>
+
+    <!-- Beras -->
+    <div class="form-section">
+      <h4>Beras</h4>
+      <label>Stok Hari ini:</label>
+      <input type="number" name="stok_beras">
+
+      <label>Kadar Air (%):</label>
+      <input type="number" name="kadarair_beras">
+
+      <label>Harga (Rp):</label>
+      <input type="number" name="harga_beras">
+    </div>
+
+    <!-- Produksi Hari Ini -->
+    <div class="form-section">
+      <h4>Produksi Hari Ini</h4>
+      <label>Jenis Gabah yang Digiling:</label>
+      <select name="jenis_giling">
+        <option value="">--Pilih--</option>
+        <option value="GKP">GKP</option>
+        <option value="GKG">GKG</option>
+      </select>
+
+      <label>Jumlah Gabah Digiling (Kg):</label>
+      <input type="number" name="jml_giling" id="jml_giling">
+
+      <label>Hasil Beras (Kg):</label>
+      <input type="number" name="hasil_beras" id="hasil_beras">
+
+      <label>Rendemen (%):</label>
+      <input type="text" name="rendemen" id="rendemen" readonly>
+      <small>Faktor Penurunan: jika ada penyusutan dari total gabah</small>
+
+      <label>Varietas:</label>
+      <input type="text" name="varietas">
+
+      <label>Asal Gabah:</label>
+      <input type="text" name="asal_gabah">
+
+      <label>Lokasi:</label>
+      <input type="text" name="lokasi" id="lokasi" readonly>
+    </div>
+
+    <button type="submit">Simpan Data</button>
+  </form>
+</div>
+
+<script>
+  // Auto Hitung Rendemen
+  const jmlGiling = document.getElementById("jml_giling");
+  const hasilBeras = document.getElementById("hasil_beras");
+  const rendemen = document.getElementById("rendemen");
+
+  function hitungRendemen(){
+    let giling = parseFloat(jmlGiling.value) || 0;
+    let beras = parseFloat(hasilBeras.value) || 0;
+    if(giling > 0){
+      rendemen.value = ((beras / giling) * 100).toFixed(2);
+    } else {
+      rendemen.value = "";
+    }
+  }
+  jmlGiling.addEventListener("input", hitungRendemen);
+  hasilBeras.addEventListener("input", hitungRendemen);
+
+  // Ambil Lokasi Otomatis + Nama Tempat
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      let lat = pos.coords.latitude;
+      let lon = pos.coords.longitude;
+
+      try {
+        let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        let data = await res.json();
+        let alamat = data.display_name || "Tidak diketahui";
+        document.getElementById("lokasi").value = `${lat}, ${lon} - ${alamat}`;
+      } catch (e) {
+        document.getElementById("lokasi").value = `${lat}, ${lon}`;
+      }
+    });
+  }
+
+  // Kirim ke Google Apps Script
+  const form = document.getElementById("dataForm");
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    let data = {};
+    formData.forEach((value, key) => data[key] = value);
+
+    try {
+      let res = await fetch("https://script.google.com/macros/s/AKfycbyT285Lve5Tzo3_S6Job4ku1zMmOPUMpE5diakQh3Z5N3dQCG1qTR_SPwDyOAYfX7hqrg/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+      let result = await res.json();
+      alert(result.message || "Data berhasil disimpan!");
+      form.reset();
+    } catch (err) {
+      alert("Gagal menyimpan data: " + err);
+    }
+  });
+</script>
+</body>
+</html>
