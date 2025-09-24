@@ -250,6 +250,7 @@
 
   // Kirim ke Google Apps Script
   const form = document.getElementById("dataForm");
+
   form.addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -258,21 +259,21 @@
     formData.forEach((value, key) => data[key] = value);
 
     try {
-      let res = await fetch("https://script.google.com/macros/s/AKfycbwa2jV6FmQvWuvjxJoyGTPKd7BTjfxRqIdGwbg5myBtZTHDZLnw_IXZX7b7krRpUTJWSQ/exec", {
-  method: "POST",
-  mode: "no-cors", // tambahkan ini kalau masih error
-  body: JSON.stringify(data),
-  headers: { "Content-Type": "application/json" }
-});
-      let result = await res.json();
-      alert(result.message || "Data berhasil disimpan!");
+      await fetch("https://script.google.com/macros/s/AKfycbwa2jV6FmQvWuvjxJoyGTPKd7BTjfxRqIdGwbg5myBtZTHDZLnw_IXZX7b7krRpUTJWSQ/exec", {
+        method: "POST",
+        mode: "no-cors",   // wajib biar request bisa jalan
+        body: JSON.stringify(data)
+      });
+
+      alert("✅ Data berhasil dikirim ke Spreadsheet!");
       form.reset();
     } catch (err) {
-      alert("Gagal menyimpan data: " + err);
+      alert("❌ Gagal menyimpan data: " + err);
     }
   });
 </script>
 </body>
 </html>
+
 
 
