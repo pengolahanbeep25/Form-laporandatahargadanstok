@@ -259,10 +259,11 @@
 
     try {
       let res = await fetch("https://script.google.com/macros/s/AKfycbyT285Lve5Tzo3_S6Job4ku1zMmOPUMpE5diakQh3Z5N3dQCG1qTR_SPwDyOAYfX7hqrg/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
+  method: "POST",
+  mode: "no-cors", // tambahkan ini kalau masih error
+  body: JSON.stringify(data),
+  headers: { "Content-Type": "application/json" }
+});
       let result = await res.json();
       alert(result.message || "Data berhasil disimpan!");
       form.reset();
@@ -273,3 +274,4 @@
 </script>
 </body>
 </html>
+
