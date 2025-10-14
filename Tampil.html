@@ -14,17 +14,25 @@
       text-align: center;
       color: #2d6a4f;
     }
+    input[type="text"] {
+      display: block;
+      margin: 10px auto;
+      padding: 8px;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
-      margin-top: 20px;
+      margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
-      font-size: 14px;
+      font-size: 13px;
       text-align: left;
     }
     th {
@@ -34,36 +42,74 @@
     tr:nth-child(even) {
       background: #f2f2f2;
     }
+    button {
+      background: #d9534f;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #c9302c;
+    }
   </style>
 </head>
 <body>
   <h2>📊 Data Laporan Stok & Harga</h2>
+  <input type="text" id="search" placeholder="🔍 Cari data...">
   <div id="data-container">Memuat data...</div>
 
   <script>
-    // Ganti link di bawah ini dengan link Web App milikmu
     const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        let html = "<table>";
-        data.forEach((row, i) => {
-          html += "<tr>";
-          row.forEach(cell => {
-            if (i === 0) html += `<th>${cell}</th>`;
-            else html += `<td>${cell}</td>`;
-          });
-          html += "</tr>";
-        });
-        html += "</table>";
-        document.getElementById("data-container").innerHTML = html;
-      })
-      .catch(err => {
+    async function loadData() {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        renderTable(data);
+      } catch (err) {
         document.getElementById("data-container").innerHTML =
           "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
+      }
+    }
+
+    function renderTable(data) {
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      let html = "<table>";
+
+      data.forEach((row, i) => {
+        if (i === 0) html += "<tr>" + row.map(h => `<th>${h}</th>`).join('') + "<th>Aksi</th></tr>";
+        else {
+          if (row.join(" ").toLowerCase().includes(searchValue)) {
+            html += "<tr>";
+            row.forEach(cell => html += `<td>${cell}</td>`);
+            html += `<td><button onclick="hapusData(${i + 1})">Hapus</button></td></tr>`;
+          }
+        }
       });
+
+      html += "</table>";
+      document.getElementById("data-container").innerHTML = html;
+    }
+
+    async function hapusData(row) {
+      if (!confirm("Yakin ingin menghapus baris ini?")) return;
+      const formData = new FormData();
+      formData.append("action", "hapus");
+      formData.append("row", row);
+
+      await fetch(url, { method: "POST", body: formData });
+      loadData();
+    }
+
+    document.getElementById("search").addEventListener("input", loadData);
+
+    // Auto-refresh tiap 30 detik
+    setInterval(loadData, 30000);
+
+    // Load awal
+    loadData();
   </script>
 </body>
 </html>
-
