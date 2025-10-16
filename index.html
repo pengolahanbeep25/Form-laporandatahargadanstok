@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
   <title>Form Input Data Gabah & Beras</title>
   <style>
     body {
@@ -13,9 +13,10 @@
       color: #333;
     }
     .overlay {
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
       min-height: 100vh;
       padding: 20px;
+      box-sizing: border-box;
     }
     .kop {
       display: flex;
@@ -23,26 +24,27 @@
       border-bottom: 3px solid #2d6a4f;
       padding-bottom: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
     .kop img {
-      height: 90px;
-      margin-right: 20px;
+      height: 80px;
+      margin-right: 15px;
     }
     .kop-text {
       flex: 1;
       text-align: center;
     }
     .kop-text h2, .kop-text h3, .kop-text p {
-      margin: 2px;
+      margin: 2px 0;
       line-height: 1.4;
     }
     .kop-text h2 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       color: #1b4332;
     }
     .kop-text h3 {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       color: #2d6a4f;
     }
@@ -51,7 +53,7 @@
       margin-bottom: 25px;
     }
     .judul-form h3 {
-      font-size: 22px;
+      font-size: 20px;
       color: #1b4332;
       border-bottom: 3px solid #2d6a4f;
       display: inline-block;
@@ -69,19 +71,22 @@
       color: #1b4332;
       border-left: 5px solid #2d6a4f;
       padding-left: 10px;
+      font-size: 16px;
     }
     label {
       display: block;
       margin-top: 10px;
       font-weight: 600;
+      font-size: 14px;
     }
     input, select {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 8px;
       margin-top: 5px;
       font-size: 14px;
+      box-sizing: border-box;
     }
     input[readonly] {
       background: #f1f1f1;
@@ -93,7 +98,7 @@
     button {
       display: block;
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       font-size: 16px;
       background: #2d6a4f;
       color: #fff;
@@ -105,13 +110,45 @@
     button:hover {
       background: #1b4332;
     }
-    @media(max-width:600px) {
+
+    /* Tambahan mobile friendly */
+    @media (max-width: 768px) {
+      .overlay {
+        padding: 15px;
+      }
       .kop {
         flex-direction: column;
         text-align: center;
       }
       .kop img {
-        margin-bottom: 10px;
+        margin: 0 0 10px 0;
+        height: 70px;
+      }
+      .kop-text h2 {
+        font-size: 16px;
+      }
+      .kop-text h3 {
+        font-size: 14px;
+      }
+      .form-section {
+        padding: 15px;
+      }
+      input, select, button {
+        font-size: 15px;
+      }
+    }
+
+    /* Optimasi di layar sangat kecil (HP lama) */
+    @media (max-width: 480px) {
+      body {
+        font-size: 14px;
+      }
+      .kop-text h2, .kop-text h3 {
+        font-size: 13px;
+      }
+      button {
+        padding: 12px;
+        font-size: 15px;
       }
     }
   </style>
@@ -136,7 +173,7 @@
 
     <!-- FORM -->
     <form id="dataForm">
-      <!-- Identitas -->
+        <!-- Identitas -->
       <div class="form-section">
         <h4>Identitas Pelapor</h4>
         <label>Nama Petani/Pelapor:</label>
@@ -659,6 +696,7 @@ form.addEventListener("submit", async function(e) {
 </script>
 </body>
 </html>
+
 
 
 
