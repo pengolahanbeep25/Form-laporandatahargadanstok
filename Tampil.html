@@ -18,35 +18,24 @@
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      margin-bottom: 15px;
     }
-    input[type="text"], select {
+    select, input[type="text"] {
       padding: 8px;
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 14px;
     }
     select {
-      background-color: #fff;
-    }
-    .bulan-section {
-      margin-top: 30px;
-      background: #e9f5ee;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .bulan-title {
-      font-size: 18px;
-      color: #1b4332;
-      margin-bottom: 10px;
-      font-weight: bold;
+      background: white;
+      cursor: pointer;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
-      margin-top: 5px;
+      margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     }
     th, td {
@@ -75,24 +64,28 @@
   <h2>📊 Data Laporan Stok & Harga</h2>
 
   <div class="filter-container">
-    <input type="text" id="search" placeholder="🔍 Cari data...">
-    <select id="filter-bulan">
-      <option value="semua">📅 Semua Bulan</option>
+    <select id="filterBulan">
+      <option value="">🗓️ Semua Bulan</option>
     </select>
+    <select id="filterPenggilingan">
+      <option value="">🏭 Semua Penggilingan</option>
+    </select>
+    <input type="text" id="search" placeholder="🔍 Cari data...">
   </div>
 
   <div id="data-container">Memuat data...</div>
 
   <script>
     const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+    let allData = [];
 
     async function loadData() {
       try {
         const res = await fetch(url);
         const data = await res.json();
-        window.allData = data; // simpan global
-        isiDropdownBulan(data);
-        renderTable(data);
+        allData = data;
+        populateFilters(data);
+        renderTable();
       } catch (err) {
         document.getElementById("data-container").innerHTML =
           "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
@@ -109,55 +102,55 @@
       return bulan[d.getMonth()] + " " + d.getFullYear();
     }
 
-    function isiDropdownBulan(data) {
+    function populateFilters(data) {
       const rows = data.slice(1);
-      const bulanUnik = new Set();
-      rows.forEach(r => bulanUnik.add(getNamaBulan(r[0])));
-      const select = document.getElementById("filter-bulan");
-      bulanUnik.forEach(b => {
-        const opt = document.createElement("option");
-        opt.value = b;
-        opt.textContent = b;
-        select.appendChild(opt);
+      const bulanSet = new Set();
+      const penggilinganSet = new Set();
+
+      rows.forEach(r => {
+        const bulan = getNamaBulan(r[0]);
+        bulanSet.add(bulan);
+        penggilinganSet.add(r[1]); // asumsikan kolom ke-2 = penggilingan
+      });
+
+      // Isi dropdown bulan
+      const bulanSelect = document.getElementById("filterBulan");
+      bulanSet.forEach(b => {
+        bulanSelect.innerHTML += `<option value="${b}">${b}</option>`;
+      });
+
+      // Isi dropdown penggilingan
+      const penggSelect = document.getElementById("filterPenggilingan");
+      penggilinganSet.forEach(p => {
+        penggSelect.innerHTML += `<option value="${p}">${p}</option>`;
       });
     }
 
-    function renderTable(data) {
+    function renderTable() {
+      const header = allData[0];
+      const rows = allData.slice(1);
       const searchValue = document.getElementById("search").value.toLowerCase();
-      const filterBulan = document.getElementById("filter-bulan").value;
+      const selectedBulan = document.getElementById("filterBulan").value;
+      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
 
-      const header = data[0];
-      const rows = data.slice(1);
+      let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
 
-      // kelompokkan berdasarkan bulan dari kolom pertama
-      const grouped = {};
-      rows.forEach((row) => {
-        const bulanKey = getNamaBulan(row[0]);
-        if (!grouped[bulanKey]) grouped[bulanKey] = [];
-        grouped[bulanKey].push(row);
+      rows.forEach((row, i) => {
+        const bulan = getNamaBulan(row[0]);
+        const penggilingan = row[1];
+        const cocokBulan = !selectedBulan || bulan === selectedBulan;
+        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
+        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
+
+        if (cocokBulan && cocokPenggilingan && cocokSearch) {
+          html += "<tr>";
+          row.forEach(cell => html += `<td>${cell}</td>`);
+          html += `<td><button onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
+        }
       });
 
-      let html = "";
-
-      for (const bulan in grouped) {
-        if (filterBulan !== "semua" && bulan !== filterBulan) continue;
-
-        html += `<div class="bulan-section">`;
-        html += `<div class="bulan-title">📅 ${bulan}</div>`;
-        html += `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
-
-        grouped[bulan].forEach((row, i) => {
-          if (row.join(" ").toLowerCase().includes(searchValue)) {
-            html += "<tr>";
-            row.forEach(cell => html += `<td>${cell}</td>`);
-            html += `<td><button onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
-          }
-        });
-
-        html += `</table></div>`;
-      }
-
-      document.getElementById("data-container").innerHTML = html || "<p>Tidak ada data ditemukan.</p>";
+      html += "</table>";
+      document.getElementById("data-container").innerHTML = html;
     }
 
     async function hapusData(row) {
@@ -169,8 +162,10 @@
       loadData();
     }
 
-    document.getElementById("search").addEventListener("input", () => renderTable(allData));
-    document.getElementById("filter-bulan").addEventListener("change", () => renderTable(allData));
+    document.getElementById("filterBulan").addEventListener("change", renderTable);
+    document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
+    document.getElementById("search").addEventListener("input", renderTable);
+
     setInterval(loadData, 30000);
     loadData();
   </script>
