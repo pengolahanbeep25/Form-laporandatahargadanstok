@@ -22,14 +22,17 @@
       margin-bottom: 15px;
     }
     select, input[type="text"] {
-      padding: 8px;
-      border-radius: 5px;
+      padding: 8px 10px;
+      border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 14px;
+      background: white;
     }
     select {
-      background: white;
       cursor: pointer;
+    }
+    input[type="text"] {
+      width: 200px;
     }
     table {
       width: 100%;
@@ -110,25 +113,24 @@
       rows.forEach(r => {
         const bulan = getNamaBulan(r[0]);
         bulanSet.add(bulan);
-        penggilinganSet.add(r[1]); // asumsikan kolom ke-2 = penggilingan
+        penggilinganSet.add(r[1]); // kolom ke-2 dianggap nama penggilingan
       });
 
-      // Isi dropdown bulan
+      // isi ulang dropdown tanpa duplikasi
       const bulanSelect = document.getElementById("filterBulan");
-      bulanSet.forEach(b => {
-        bulanSelect.innerHTML += `<option value="${b}">${b}</option>`;
-      });
+      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
+      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
 
-      // Isi dropdown penggilingan
       const penggSelect = document.getElementById("filterPenggilingan");
-      penggilinganSet.forEach(p => {
-        penggSelect.innerHTML += `<option value="${p}">${p}</option>`;
-      });
+      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
+      penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
     function renderTable() {
+      if (allData.length === 0) return;
       const header = allData[0];
       const rows = allData.slice(1);
+
       const searchValue = document.getElementById("search").value.toLowerCase();
       const selectedBulan = document.getElementById("filterBulan").value;
       const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
@@ -166,7 +168,10 @@
     document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
     document.getElementById("search").addEventListener("input", renderTable);
 
+    // auto-refresh tiap 30 detik
     setInterval(loadData, 30000);
+
+    // load awal
     loadData();
   </script>
 </body>
