@@ -22,11 +22,23 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
+    .bulan-section {
+      margin-top: 30px;
+      background: #e9f5ee;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .bulan-title {
+      font-size: 18px;
+      color: #1b4332;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
-      margin-top: 10px;
+      margin-top: 5px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     }
     th, td {
@@ -39,9 +51,7 @@
       background: #2d6a4f;
       color: white;
     }
-    tr:nth-child(even) {
-      background: #f2f2f2;
-    }
+    tr:nth-child(even) { background: #f2f2f2; }
     button {
       background: #d9534f;
       color: white;
@@ -50,9 +60,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button:hover {
-      background: #c9302c;
-    }
+    button:hover { background: #c9302c; }
   </style>
 </head>
 <body>
@@ -74,23 +82,50 @@
       }
     }
 
+    function getNamaBulan(dateStr) {
+      const bulan = [
+        "Januari","Februari","Maret","April","Mei","Juni",
+        "Juli","Agustus","September","Oktober","November","Desember"
+      ];
+      const d = new Date(dateStr);
+      if (isNaN(d)) return "Tidak diketahui";
+      return bulan[d.getMonth()] + " " + d.getFullYear();
+    }
+
     function renderTable(data) {
       const searchValue = document.getElementById("search").value.toLowerCase();
-      let html = "<table>";
 
-      data.forEach((row, i) => {
-        if (i === 0) html += "<tr>" + row.map(h => `<th>${h}</th>`).join('') + "<th>Aksi</th></tr>";
-        else {
+      // anggap baris pertama = header
+      const header = data[0];
+      const rows = data.slice(1);
+
+      // kelompokkan berdasarkan bulan dari kolom pertama (tanggal)
+      const grouped = {};
+      rows.forEach((row) => {
+        const bulanKey = getNamaBulan(row[0]);
+        if (!grouped[bulanKey]) grouped[bulanKey] = [];
+        grouped[bulanKey].push(row);
+      });
+
+      let html = "";
+
+      for (const bulan in grouped) {
+        html += `<div class="bulan-section">`;
+        html += `<div class="bulan-title">📅 ${bulan}</div>`;
+        html += `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
+
+        grouped[bulan].forEach((row, i) => {
           if (row.join(" ").toLowerCase().includes(searchValue)) {
             html += "<tr>";
             row.forEach(cell => html += `<td>${cell}</td>`);
-            html += `<td><button onclick="hapusData(${i + 1})">Hapus</button></td></tr>`;
+            html += `<td><button onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
           }
-        }
-      });
+        });
 
-      html += "</table>";
-      document.getElementById("data-container").innerHTML = html;
+        html += `</table></div>`;
+      }
+
+      document.getElementById("data-container").innerHTML = html || "<p>Tidak ada data ditemukan.</p>";
     }
 
     async function hapusData(row) {
@@ -98,17 +133,12 @@
       const formData = new FormData();
       formData.append("action", "hapus");
       formData.append("row", row);
-
       await fetch(url, { method: "POST", body: formData });
       loadData();
     }
 
     document.getElementById("search").addEventListener("input", loadData);
-
-    // Auto-refresh tiap 30 detik
     setInterval(loadData, 30000);
-
-    // Load awal
     loadData();
   </script>
 </body>
