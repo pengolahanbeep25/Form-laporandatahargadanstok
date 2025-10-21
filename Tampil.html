@@ -14,13 +14,21 @@
       text-align: center;
       color: #2d6a4f;
     }
-    input[type="text"] {
-      display: block;
-      margin: 10px auto;
+    .filter-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    input[type="text"], select {
       padding: 8px;
-      width: 80%;
       border-radius: 5px;
       border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    select {
+      background-color: #fff;
     }
     .bulan-section {
       margin-top: 30px;
@@ -65,7 +73,14 @@
 </head>
 <body>
   <h2>📊 Data Laporan Stok & Harga</h2>
-  <input type="text" id="search" placeholder="🔍 Cari data...">
+
+  <div class="filter-container">
+    <input type="text" id="search" placeholder="🔍 Cari data...">
+    <select id="filter-bulan">
+      <option value="semua">📅 Semua Bulan</option>
+    </select>
+  </div>
+
   <div id="data-container">Memuat data...</div>
 
   <script>
@@ -75,6 +90,8 @@
       try {
         const res = await fetch(url);
         const data = await res.json();
+        window.allData = data; // simpan global
+        isiDropdownBulan(data);
         renderTable(data);
       } catch (err) {
         document.getElementById("data-container").innerHTML =
@@ -92,14 +109,27 @@
       return bulan[d.getMonth()] + " " + d.getFullYear();
     }
 
+    function isiDropdownBulan(data) {
+      const rows = data.slice(1);
+      const bulanUnik = new Set();
+      rows.forEach(r => bulanUnik.add(getNamaBulan(r[0])));
+      const select = document.getElementById("filter-bulan");
+      bulanUnik.forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b;
+        opt.textContent = b;
+        select.appendChild(opt);
+      });
+    }
+
     function renderTable(data) {
       const searchValue = document.getElementById("search").value.toLowerCase();
+      const filterBulan = document.getElementById("filter-bulan").value;
 
-      // anggap baris pertama = header
       const header = data[0];
       const rows = data.slice(1);
 
-      // kelompokkan berdasarkan bulan dari kolom pertama (tanggal)
+      // kelompokkan berdasarkan bulan dari kolom pertama
       const grouped = {};
       rows.forEach((row) => {
         const bulanKey = getNamaBulan(row[0]);
@@ -110,6 +140,8 @@
       let html = "";
 
       for (const bulan in grouped) {
+        if (filterBulan !== "semua" && bulan !== filterBulan) continue;
+
         html += `<div class="bulan-section">`;
         html += `<div class="bulan-title">📅 ${bulan}</div>`;
         html += `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
@@ -137,7 +169,8 @@
       loadData();
     }
 
-    document.getElementById("search").addEventListener("input", loadData);
+    document.getElementById("search").addEventListener("input", () => renderTable(allData));
+    document.getElementById("filter-bulan").addEventListener("change", () => renderTable(allData));
     setInterval(loadData, 30000);
     loadData();
   </script>
