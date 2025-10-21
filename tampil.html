@@ -7,12 +7,43 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background: #f8f9fa;
+      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
+                  no-repeat center center fixed;
+      background-size: cover;
       padding: 20px;
+      margin: 0;
+    }
+    header {
+      background: rgba(21, 71, 52, 0.95);
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(3px);
     }
     h2 {
-      text-align: center;
-      color: #2d6a4f;
+      margin: 10px 0;
+    }
+    .btn-home {
+      display: inline-block;
+      background: #2d6a4f;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .btn-home:hover {
+      background: #1b4332;
+    }
+    .content {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(4px);
     }
     .filter-container {
       display: flex;
@@ -64,19 +95,24 @@
   </style>
 </head>
 <body>
-  <h2>📊 Data Laporan Stok & Harga</h2>
+  <header>
+    <a href="index.html" class="btn-home">🏠 Kembali ke Dashboard</a>
+    <h2>📊 Data Laporan Stok & Harga</h2>
+  </header>
 
-  <div class="filter-container">
-    <select id="filterBulan">
-      <option value="">🗓️ Semua Bulan</option>
-    </select>
-    <select id="filterPenggilingan">
-      <option value="">🏭 Semua Penggilingan</option>
-    </select>
-    <input type="text" id="search" placeholder="🔍 Cari data...">
+  <div class="content">
+    <div class="filter-container">
+      <select id="filterBulan">
+        <option value="">🗓️ Semua Bulan</option>
+      </select>
+      <select id="filterPenggilingan">
+        <option value="">🏭 Semua Penggilingan</option>
+      </select>
+      <input type="text" id="search" placeholder="🔍 Cari data...">
+    </div>
+
+    <div id="data-container">Memuat data...</div>
   </div>
-
-  <div id="data-container">Memuat data...</div>
 
   <script>
     const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
@@ -113,10 +149,9 @@
       rows.forEach(r => {
         const bulan = getNamaBulan(r[0]);
         bulanSet.add(bulan);
-        penggilinganSet.add(r[1]); // kolom ke-2 dianggap nama penggilingan
+        penggilinganSet.add(r[1]);
       });
 
-      // isi ulang dropdown tanpa duplikasi
       const bulanSelect = document.getElementById("filterBulan");
       bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
       bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
@@ -168,10 +203,7 @@
     document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
     document.getElementById("search").addEventListener("input", renderTable);
 
-    // auto-refresh tiap 30 detik
     setInterval(loadData, 30000);
-
-    // load awal
     loadData();
   </script>
 </body>
