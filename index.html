@@ -143,15 +143,25 @@
         return;
       }
 
-      // daftar akun
+      // daftar akun (bisa tambah sesuai kebutuhan)
       const akun = {
         kabidtph: "12345",
-        kabidkdp: "12345"
+        kabidkdp: "12345",
+        kadis: "123",
+        petani: "123"
       };
 
       if (akun[user] && akun[user] === pass) {
         localStorage.setItem("loginUser", user);
-        window.location.href = "dashboad.html";
+
+        // arahkan berdasarkan user
+        if (user === "kadis" || user === "kabidtph" || user === "kabidkdp") {
+          window.location.href = "dashboad.html";
+        } else if (user === "petani") {
+          window.location.href = "form.html";
+        } else {
+          msg.textContent = "Akun tidak dikenali.";
+        }
       } else {
         msg.textContent = "Username atau password salah.";
       }
