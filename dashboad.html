@@ -84,6 +84,14 @@
       background: #1e8c51;
     }
 
+    .logout {
+      background: #b02a37;
+    }
+
+    .logout:hover {
+      background: #c93e4a;
+    }
+
     footer {
       text-align: center;
       font-size: 0.85em;
@@ -96,7 +104,7 @@
 </head>
 <body>
   <header>
-    DINAS PERTANIAN DAN PANGAN KABUPATEN INHIL
+    DINAS PANGAN, TANAMAN PANGAN, HORTIKULTURA DAN PETERNAKAN KABUPATEN INDRAGIRI HILIR
     <small>Sistem Laporan Stok, Produksi, dan Harga Gabah/Beras</small>
   </header>
 
@@ -106,11 +114,24 @@
       <p>Pilih menu untuk melanjutkan ke halaman laporan.</p>
       <a href="form.html" class="btn">📝 Isi Form Laporan</a>
       <a href="tampil.html" class="btn">📊 Lihat Rekap Data</a>
+      <a href="#" class="btn logout" onclick="logout()">🚪 Logout</a>
     </div>
   </main>
 
   <footer>
     © 2025 Dinas Pertanian dan Pangan Kabupaten Indragiri Hilir
   </footer>
+
+  <script>
+    // jika belum login, balik ke index
+    if (!localStorage.getItem("loginUser")) {
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loginUser");
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
-</html>
+</html>
