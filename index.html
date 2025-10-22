@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dinas Pangan, Tanaman Pangan, Hortikultura dan Peternakan Kabupaten Inhil</title>
+  <title>Login Sistem Dinas</title>
   <style>
     * {
       margin: 0;
@@ -68,20 +68,37 @@
       margin-bottom: 25px;
     }
 
-    .btn {
-      display: block;
-      background: #196d3f;
-      color: #fff;
-      text-decoration: none;
-      padding: 12px 0;
-      border-radius: 8px;
-      font-weight: 600;
-      margin: 8px 0;
-      transition: background 0.3s ease;
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
     }
 
-    .btn:hover {
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #196d3f;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
       background: #1e8c51;
+    }
+
+    .error {
+      color: #b02a37;
+      margin-top: 10px;
+      font-size: 0.9em;
     }
 
     footer {
@@ -102,16 +119,48 @@
 
   <main>
     <div class="card">
-      <h2>Selamat Datang</h2>
-      <p>Pilih menu untuk melanjutkan ke halaman laporan.</p>
-      <a href="form.html" class="btn">📝 Isi Form Laporan</a>
-      <a href="tampil.html" class="btn">📊 Lihat Rekap Data</a>
+      <h2>Login Sistem</h2>
+      <p>Masukkan username dan password Anda.</p>
+      <input type="text" id="username" placeholder="Username" autocomplete="off">
+      <input type="password" id="password" placeholder="Password" autocomplete="off">
+      <button onclick="login()">Masuk</button>
+      <div class="error" id="errorMsg"></div>
     </div>
   </main>
 
   <footer>
     © 2025 Dinas Pertanian dan Pangan Kabupaten Indragiri Hilir
   </footer>
+
+  <script>
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const msg = document.getElementById("errorMsg");
+
+      if (!user || !pass) {
+        msg.textContent = "Harap isi username dan password.";
+        return;
+      }
+
+      // daftar akun
+      const akun = {
+        kabidtph: "12345",
+        kabidkdp: "12345"
+      };
+
+      if (akun[user] && akun[user] === pass) {
+        localStorage.setItem("loginUser", user);
+        window.location.href = "dasboard.html";
+      } else {
+        msg.textContent = "Username atau password salah.";
+      }
+    }
+
+    // tekan Enter untuk login
+    document.addEventListener("keypress", e => {
+      if (e.key === "Enter") login();
+    });
+  </script>
 </body>
 </html>
-
