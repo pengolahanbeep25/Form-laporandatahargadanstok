@@ -45,8 +45,12 @@
       font-size: 14px;
       background: white;
     }
-    select { cursor: pointer; }
-    input[type="text"] { width: 200px; }
+    select {
+      cursor: pointer;
+    }
+    input[type="text"] {
+      width: 200px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -94,21 +98,34 @@
     .btn-danger:hover {
       background: #c9302c;
     }
+    .total-box {
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1b4332;
+      background: #e9f5ee;
+      border: 1px solid #b7dfc4;
+      padding: 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
     @media print {
       .filter-container, .action-bar, button {
         display: none;
       }
-      body { background: none; }
-      .content { box-shadow: none; }
+      body {
+        background: none;
+      }
+      .content {
+        box-shadow: none;
+      }
     }
   </style>
 </head>
-
 <body>
   <header>
     <h2>📊 Data Laporan Stok & Harga</h2>
   </header>
-
   <div class="content">
     <div class="filter-container">
       <select id="filterBulan">
@@ -120,7 +137,6 @@
       <input type="text" id="search" placeholder="🔍 Cari data...">
     </div>
 
-    <!-- Tombol aksi -->
     <div class="action-bar">
       <a href="index.html" class="btn-action">🏠 Kembali ke Dashboard</a>
       <button onclick="printTable()">🖨️ Print</button>
@@ -129,10 +145,12 @@
     </div>
 
     <div id="data-container">Memuat data...</div>
+    <div id="total-container" class="total-box"></div>
   </div>
 
   <!-- jsPDF & SheetJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
@@ -147,16 +165,12 @@
         populateFilters(data);
         renderTable();
       } catch (err) {
-        document.getElementById("data-container").innerHTML =
-          "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
+        document.getElementById("data-container").innerHTML = "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
       }
     }
 
     function getNamaBulan(dateStr) {
-      const bulan = [
-        "Januari","Februari","Maret","April","Mei","Juni",
-        "Juli","Agustus","September","Oktober","November","Desember"
-      ];
+      const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
       const d = new Date(dateStr);
       if (isNaN(d)) return "Tidak diketahui";
       return bulan[d.getMonth()] + " " + d.getFullYear();
@@ -166,7 +180,6 @@
       const rows = data.slice(1);
       const bulanSet = new Set();
       const penggilinganSet = new Set();
-
       rows.forEach(r => {
         const bulan = getNamaBulan(r[0]);
         bulanSet.add(bulan);
@@ -183,7 +196,6 @@
     }
 
     function getFilteredRows() {
-      const header = allData[0];
       const rows = allData.slice(1);
       const searchValue = document.getElementById("search").value.toLowerCase();
       const selectedBulan = document.getElementById("filterBulan").value;
@@ -205,4 +217,71 @@
       const rows = getFilteredRows();
       let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
 
-      rows
+      rows.forEach((row, i) => {
+        html += "<tr>";
+        row.forEach(cell => html += `<td>${cell}</td>`);
+        html += `<td><button class="btn-danger" onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
+      });
+
+      html += "</table>";
+      document.getElementById("data-container").innerHTML = html;
+
+      // Hitung total
+      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
+      rows.forEach(r => {
+        totalGKP += parseFloat(r[4]) || 0;
+        totalGKG += parseFloat(r[8]) || 0;
+        totalBeras += parseFloat(r[12]) || 0;
+        totalProduksi += parseFloat(r[17]) || 0;
+      });
+
+      const ton = n => (n / 1000).toFixed(2);
+      document.getElementById("total-container").innerHTML =
+        rows.length > 0
+        ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton`
+        : "";
+    }
+
+    async function hapusData(row) {
+      if (!confirm("Yakin ingin menghapus baris ini?")) return;
+      const formData = new FormData();
+      formData.append("action", "hapus");
+      formData.append("row", row);
+      await fetch(url, { method: "POST", body: formData });
+      loadData();
+    }
+
+    function printTable() {
+      window.print();
+    }
+
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+      const element = document.querySelector(".content");
+      const canvas = await html2canvas(element, { scale: 1 });
+      const img = canvas.toDataURL("image/png");
+      const width = doc.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+      doc.addImage(img, "PNG", 0, 0, width, height);
+      doc.save("Laporan_Stok_Harga.pdf");
+    }
+
+    function downloadExcel() {
+      const rows = getFilteredRows();
+      const header = allData[0];
+      const data = [header, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+      XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
+    }
+
+    document.getElementById("filterBulan").addEventListener("change", renderTable);
+    document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
+    document.getElementById("search").addEventListener("input", renderTable);
+    setInterval(loadData, 30000);
+    loadData();
+  </script>
+</body>
+</html>
