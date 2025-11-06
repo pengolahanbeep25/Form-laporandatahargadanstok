@@ -7,52 +7,21 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-                  no-repeat center center fixed;
-      background-size: cover;
+      background: #f8f9fa;
       padding: 20px;
-      margin: 0;
     }
-
-    header {
-      background: rgba(21, 71, 52, 0.95);
-      color: white;
+    h2 {
       text-align: center;
-      padding: 15px 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(3px);
+      color: #2d6a4f;
     }
-
-    h2 { margin: 10px 0; }
-
-    .content {
-      background: rgba(255, 255, 255, 0.92);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      backdrop-filter: blur(4px);
-    }
-
-    .filter-container {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-
-    select, input[type="text"] {
-      padding: 8px 10px;
-      border-radius: 6px;
+    input[type="text"] {
+      display: block;
+      margin: 10px auto;
+      padding: 8px;
+      width: 80%;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      font-size: 14px;
-      background: white;
     }
-
-    select { cursor: pointer; }
-    input[type="text"] { width: 200px; }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -60,223 +29,131 @@
       margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       font-size: 13px;
       text-align: left;
     }
-
-    th { background: #2d6a4f; color: white; }
-    tr:nth-child(even) { background: #f2f2f2; }
-
-    .rekap {
-      background: #dff5e1;
-      font-weight: bold;
-      border-top: 3px solid #2d6a4f;
+    th {
+      background: #2d6a4f;
+      color: white;
     }
-
-    button, .btn-action {
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    button {
       background: #2d6a4f;
       color: white;
       border: none;
       padding: 6px 12px;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 13px;
-      font-weight: 600;
-      transition: background 0.3s;
+      margin-right: 5px;
     }
-
-    button:hover, .btn-action:hover { background: #1b4332; }
-
+    button:hover {
+      background: #245b45;
+    }
     .action-bar {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+      text-align: right;
       margin-bottom: 10px;
-      flex-wrap: wrap;
     }
-
-    .btn-danger { background: #d9534f; }
-    .btn-danger:hover { background: #c9302c; }
-
-    @media print {
-      .filter-container, .action-bar, button { display: none; }
-      body { background: none; }
-      .content { box-shadow: none; }
+    #total-row {
+      background: #dff6e0;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h2>📊 Data Laporan Stok & Harga</h2>
-  </header>
+  <h2>📊 Data Laporan Stok & Harga</h2>
+  <input type="text" id="search" placeholder="🔍 Cari nama penggilingan...">
 
-  <div class="content">
-    <div class="filter-container">
-      <select id="filterBulan">
-        <option value="">🗓️ Semua Bulan</option>
-      </select>
-      <select id="filterPenggilingan">
-        <option value="">🏭 Semua Penggilingan</option>
-      </select>
-      <input type="text" id="search" placeholder="🔍 Cari data...">
-    </div>
-
-    <div class="action-bar">
-      <a href="index.html" class="btn-action">🏠 Kembali ke Dashboard</a>
-      <button onclick="printTable()">🖨️ Print</button>
-      <button onclick="downloadPDF()">⬇️ PDF</button>
-      <button onclick="downloadExcel()">⬇️ Excel</button>
-    </div>
-
-    <div id="data-container">Memuat data...</div>
+  <div class="action-bar">
+    <button onclick="downloadPDF()">Download PDF</button>
   </div>
 
-  <!-- jsPDF & SheetJS -->
+  <div id="data-container">Memuat data...</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
     const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
-    let allData = [];
 
     async function loadData() {
       try {
         const res = await fetch(url);
         const data = await res.json();
-        allData = data;
-        populateFilters(data);
-        renderGroupedTable();
+        renderTable(data);
       } catch (err) {
         document.getElementById("data-container").innerHTML =
           "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
       }
     }
 
-    function populateFilters(data) {
-      const rows = data.slice(1);
-      const bulanSet = new Set();
-      const penggSet = new Set();
-
-      rows.forEach(r => {
-        bulanSet.add(r[2] + " " + r[3]); // bulan + tahun
-        penggSet.add(r[5]); // nama penggilingan
-      });
-
-      const bulanSelect = document.getElementById("filterBulan");
-      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
-      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
-
-      const penggSelect = document.getElementById("filterPenggilingan");
-      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
-      penggSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
-    }
-
-    function getFilteredRows() {
-      const header = allData[0];
-      const rows = allData.slice(1);
+    function renderTable(data) {
       const searchValue = document.getElementById("search").value.toLowerCase();
-      const selectedBulan = document.getElementById("filterBulan").value;
-      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
+      let html = "<table>";
+      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
 
-      return rows.filter(row => {
-        const bulan = row[2] + " " + row[3];
-        const penggilingan = row[5];
-        const cocokBulan = !selectedBulan || bulan === selectedBulan;
-        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
-        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
-        return cocokBulan && cocokPenggilingan && cocokSearch;
-      });
-    }
+      data.forEach((row, i) => {
+        if (i === 0) {
+          html += "<tr>" + row.map(h => `<th>${h}</th>`).join('') + "</tr>";
+        } else {
+          const match = row.join(" ").toLowerCase().includes(searchValue);
+          if (searchValue === "" || match) {
+            html += "<tr>" + row.map(cell => `<td>${cell}</td>`).join('') + "</tr>";
 
-    function renderGroupedTable() {
-      const header = allData[0];
-      const rows = getFilteredRows();
+            // Coba temukan nilai stok dan produksi berdasarkan header
+            const headers = data[0].map(h => h.toLowerCase());
+            const stokGKPIndex = headers.findIndex(h => h.includes("stok gkp"));
+            const stokGKGIndex = headers.findIndex(h => h.includes("stok gkg"));
+            const stokBerasIndex = headers.findIndex(h => h.includes("stok beras"));
+            const produksiIndex = headers.findIndex(h => h.includes("produksi"));
 
-      // Kelompokkan per bulan
-      const grouped = {};
-      rows.forEach(r => {
-        const bulan = r[2] + " " + r[3];
-        const nama = r[5];
-        if (!grouped[bulan]) grouped[bulan] = {};
-        if (!grouped[bulan][nama]) grouped[bulan][nama] = [];
-        grouped[bulan][nama].push(r);
-      });
-
-      let html = "";
-
-      for (const bulan in grouped) {
-        html += `<h3 style="color:#1b4332;">🗓️ ${bulan}</h3>`;
-        for (const nama in grouped[bulan]) {
-          const dataPetani = grouped[bulan][nama];
-          const totalProduksi = sumKolom(dataPetani, [30,31,32]);
-          const totalStok = sumKolom(dataPetani, [50,51,52]);
-          html += `
-            <h4>🏭 ${nama}</h4>
-            <table>
-              <tr>${header.map(h => `<th>${h}</th>`).join("")}</tr>
-              ${dataPetani.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}
-              <tr class="rekap">
-                <td colspan="${header.length}">
-                  Total Produksi: ${totalProduksi.toFixed(2)} ton | 
-                  Total Stok: ${totalStok.toFixed(2)} ton
-                </td>
-              </tr>
-            </table>
-          `;
+            if (stokGKPIndex > -1) totalGKP += parseFloat(row[stokGKPIndex] || 0);
+            if (stokGKGIndex > -1) totalGKG += parseFloat(row[stokGKGIndex] || 0);
+            if (stokBerasIndex > -1) totalBeras += parseFloat(row[stokBerasIndex] || 0);
+            if (produksiIndex > -1) totalProduksi += parseFloat(row[produksiIndex] || 0);
+          }
         }
+      });
+
+      html += "</table>";
+
+      // Tambahkan baris total kalau ada filter
+      if (searchValue !== "") {
+        html += `
+          <table>
+            <tr id="total-row">
+              <td colspan="100%">
+                Total Produksi: <b>${totalProduksi.toFixed(2)} Ton</b> |
+                Total Stok GKP: <b>${totalGKP.toFixed(2)} Ton</b> |
+                Total Stok GKG: <b>${totalGKG.toFixed(2)} Ton</b> |
+                Total Stok Beras: <b>${totalBeras.toFixed(2)} Ton</b>
+              </td>
+            </tr>
+          </table>`;
       }
 
-      document.getElementById("data-container").innerHTML = html || "<p>Tidak ada data.</p>";
-    }
-
-    function sumKolom(data, idxArr) {
-      return data.reduce((total, row) => {
-        let subtotal = 0;
-        idxArr.forEach(i => subtotal += parseFloat(row[i] || 0));
-        return total + subtotal;
-      }, 0);
-    }
-
-    function printTable() {
-      window.print();
+      document.getElementById("data-container").innerHTML = html;
     }
 
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-      let y = 40;
-
-      doc.text("Laporan Stok & Harga", 40, 25);
-      for (const el of document.querySelectorAll("h3, h4, table")) {
-        if (el.tagName === "H3" || el.tagName === "H4") {
-          doc.text(el.textContent, 40, y);
-          y += 15;
-        } else if (el.tagName === "TABLE") {
-          doc.autoTable({ html: el, startY: y, styles: { fontSize: 7 } });
-          y = doc.lastAutoTable.finalY + 20;
-        }
-      }
-      doc.save("Laporan_Stok_Harga.pdf");
+      const element = document.getElementById("data-container");
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = { width: pageWidth, height: (canvas.height * pageWidth) / canvas.width };
+      pdf.addImage(imgData, "PNG", 0, 10, imgProps.width, imgProps.height);
+      pdf.save("Laporan_Stok_Harga.pdf");
     }
 
-    function downloadExcel() {
-      const header = allData[0];
-      const rows = getFilteredRows();
-      const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-      XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
-    }
-
-    document.getElementById("filterBulan").addEventListener("change", renderGroupedTable);
-    document.getElementById("filterPenggilingan").addEventListener("change", renderGroupedTable);
-    document.getElementById("search").addEventListener("input", renderGroupedTable);
-
+    document.getElementById("search").addEventListener("input", loadData);
     setInterval(loadData, 30000);
     loadData();
   </script>
