@@ -7,21 +7,46 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background: #f8f9fa;
+      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
+      background-size: cover;
       padding: 20px;
+      margin: 0;
+    }
+    header {
+      background: rgba(21, 71, 52, 0.95);
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(3px);
     }
     h2 {
-      text-align: center;
-      color: #2d6a4f;
+      margin: 10px 0;
     }
-    input[type="text"] {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      width: 80%;
-      border-radius: 5px;
+    .content {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(4px);
+    }
+    .filter-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    select, input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 14px;
+      background: white;
     }
+    select { cursor: pointer; }
+    input[type="text"] { width: 200px; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -42,120 +67,142 @@
     tr:nth-child(even) {
       background: #f2f2f2;
     }
-    button {
+    button, .btn-action {
       background: #2d6a4f;
       color: white;
       border: none;
       padding: 6px 12px;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 13px;
-      margin-right: 5px;
+      font-weight: 600;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #245b45;
+    button:hover, .btn-action:hover {
+      background: #1b4332;
     }
     .action-bar {
-      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
       margin-bottom: 10px;
+      flex-wrap: wrap;
     }
-    #total-row {
-      background: #dff6e0;
-      font-weight: bold;
+    .btn-danger {
+      background: #d9534f;
+    }
+    .btn-danger:hover {
+      background: #c9302c;
+    }
+    @media print {
+      .filter-container, .action-bar, button {
+        display: none;
+      }
+      body { background: none; }
+      .content { box-shadow: none; }
     }
   </style>
 </head>
-<body>
-  <h2>📊 Data Laporan Stok & Harga</h2>
-  <input type="text" id="search" placeholder="🔍 Cari nama penggilingan...">
 
-  <div class="action-bar">
-    <button onclick="downloadPDF()">Download PDF</button>
+<body>
+  <header>
+    <h2>📊 Data Laporan Stok & Harga</h2>
+  </header>
+
+  <div class="content">
+    <div class="filter-container">
+      <select id="filterBulan">
+        <option value="">🗓️ Semua Bulan</option>
+      </select>
+      <select id="filterPenggilingan">
+        <option value="">🏭 Semua Penggilingan</option>
+      </select>
+      <input type="text" id="search" placeholder="🔍 Cari data...">
+    </div>
+
+    <!-- Tombol aksi -->
+    <div class="action-bar">
+      <a href="index.html" class="btn-action">🏠 Kembali ke Dashboard</a>
+      <button onclick="printTable()">🖨️ Print</button>
+      <button onclick="downloadPDF()">⬇️ PDF</button>
+      <button onclick="downloadExcel()">⬇️ Excel</button>
+    </div>
+
+    <div id="data-container">Memuat data...</div>
   </div>
 
-  <div id="data-container">Memuat data...</div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF & SheetJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
     const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+    let allData = [];
 
     async function loadData() {
       try {
         const res = await fetch(url);
         const data = await res.json();
-        renderTable(data);
+        allData = data;
+        populateFilters(data);
+        renderTable();
       } catch (err) {
         document.getElementById("data-container").innerHTML =
           "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
       }
     }
 
-    function renderTable(data) {
-      const searchValue = document.getElementById("search").value.toLowerCase();
-      let html = "<table>";
-      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
+    function getNamaBulan(dateStr) {
+      const bulan = [
+        "Januari","Februari","Maret","April","Mei","Juni",
+        "Juli","Agustus","September","Oktober","November","Desember"
+      ];
+      const d = new Date(dateStr);
+      if (isNaN(d)) return "Tidak diketahui";
+      return bulan[d.getMonth()] + " " + d.getFullYear();
+    }
 
-      data.forEach((row, i) => {
-        if (i === 0) {
-          html += "<tr>" + row.map(h => `<th>${h}</th>`).join('') + "</tr>";
-        } else {
-          const match = row.join(" ").toLowerCase().includes(searchValue);
-          if (searchValue === "" || match) {
-            html += "<tr>" + row.map(cell => `<td>${cell}</td>`).join('') + "</tr>";
+    function populateFilters(data) {
+      const rows = data.slice(1);
+      const bulanSet = new Set();
+      const penggilinganSet = new Set();
 
-            // Coba temukan nilai stok dan produksi berdasarkan header
-            const headers = data[0].map(h => h.toLowerCase());
-            const stokGKPIndex = headers.findIndex(h => h.includes("stok gkp"));
-            const stokGKGIndex = headers.findIndex(h => h.includes("stok gkg"));
-            const stokBerasIndex = headers.findIndex(h => h.includes("stok beras"));
-            const produksiIndex = headers.findIndex(h => h.includes("produksi"));
-
-            if (stokGKPIndex > -1) totalGKP += parseFloat(row[stokGKPIndex] || 0);
-            if (stokGKGIndex > -1) totalGKG += parseFloat(row[stokGKGIndex] || 0);
-            if (stokBerasIndex > -1) totalBeras += parseFloat(row[stokBerasIndex] || 0);
-            if (produksiIndex > -1) totalProduksi += parseFloat(row[produksiIndex] || 0);
-          }
-        }
+      rows.forEach(r => {
+        const bulan = getNamaBulan(r[0]);
+        bulanSet.add(bulan);
+        penggilinganSet.add(r[1]);
       });
 
-      html += "</table>";
+      const bulanSelect = document.getElementById("filterBulan");
+      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
+      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
 
-      // Tambahkan baris total kalau ada filter
-      if (searchValue !== "") {
-        html += `
-          <table>
-            <tr id="total-row">
-              <td colspan="100%">
-                Total Produksi: <b>${totalProduksi.toFixed(2)} Ton</b> |
-                Total Stok GKP: <b>${totalGKP.toFixed(2)} Ton</b> |
-                Total Stok GKG: <b>${totalGKG.toFixed(2)} Ton</b> |
-                Total Stok Beras: <b>${totalBeras.toFixed(2)} Ton</b>
-              </td>
-            </tr>
-          </table>`;
-      }
-
-      document.getElementById("data-container").innerHTML = html;
+      const penggSelect = document.getElementById("filterPenggilingan");
+      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
+      penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const element = document.getElementById("data-container");
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgProps = { width: pageWidth, height: (canvas.height * pageWidth) / canvas.width };
-      pdf.addImage(imgData, "PNG", 0, 10, imgProps.width, imgProps.height);
-      pdf.save("Laporan_Stok_Harga.pdf");
+    function getFilteredRows() {
+      const header = allData[0];
+      const rows = allData.slice(1);
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      const selectedBulan = document.getElementById("filterBulan").value;
+      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
+
+      return rows.filter(row => {
+        const bulan = getNamaBulan(row[0]);
+        const penggilingan = row[1];
+        const cocokBulan = !selectedBulan || bulan === selectedBulan;
+        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
+        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
+        return cocokBulan && cocokPenggilingan && cocokSearch;
+      });
     }
 
-    document.getElementById("search").addEventListener("input", loadData);
-    setInterval(loadData, 30000);
-    loadData();
-  </script>
-</body>
-</html>
+    function renderTable() {
+      if (allData.length === 0) return;
+      const header = allData[0];
+      const rows = getFilteredRows();
+      let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
+
+      rows
