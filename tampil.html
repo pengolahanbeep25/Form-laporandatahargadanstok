@@ -21,15 +21,14 @@
       margin-bottom: 20px;
       backdrop-filter: blur(3px);
     }
-    h2 {
-      margin: 10px 0;
-    }
+    h2 { margin: 10px 0; }
     .content {
       background: rgba(255, 255, 255, 0.92);
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       backdrop-filter: blur(4px);
+      overflow-x: auto;
     }
     .filter-container {
       display: flex;
@@ -45,32 +44,24 @@
       font-size: 14px;
       background: white;
     }
-    select {
-      cursor: pointer;
-    }
-    input[type="text"] {
-      width: 200px;
-    }
+    input[type="text"] { width: 200px; }
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
       margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      min-width: 900px;
     }
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       font-size: 13px;
       text-align: left;
+      white-space: nowrap;
     }
-    th {
-      background: #2d6a4f;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background: #f2f2f2;
-    }
+    th { background: #2d6a4f; color: white; }
+    tr:nth-child(even) { background: #f2f2f2; }
     button, .btn-action {
       background: #2d6a4f;
       color: white;
@@ -82,9 +73,7 @@
       font-weight: 600;
       transition: background 0.3s;
     }
-    button:hover, .btn-action:hover {
-      background: #1b4332;
-    }
+    button:hover, .btn-action:hover { background: #1b4332; }
     .action-bar {
       display: flex;
       justify-content: flex-end;
@@ -92,12 +81,8 @@
       margin-bottom: 10px;
       flex-wrap: wrap;
     }
-    .btn-danger {
-      background: #d9534f;
-    }
-    .btn-danger:hover {
-      background: #c9302c;
-    }
+    .btn-danger { background: #d9534f; }
+    .btn-danger:hover { background: #c9302c; }
     .total-box {
       margin-top: 15px;
       font-weight: 600;
@@ -110,30 +95,19 @@
       width: fit-content;
     }
     @media print {
-      .filter-container, .action-bar, button {
-        display: none;
-      }
-      body {
-        background: none;
-      }
-      .content {
-        box-shadow: none;
-      }
+      .filter-container, .action-bar, button { display: none; }
+      body { background: none; }
+      .content { box-shadow: none; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h2>📊 Data Laporan Stok & Harga</h2>
-  </header>
+  <header><h2>📊 Data Laporan Stok & Harga</h2></header>
+
   <div class="content">
     <div class="filter-container">
-      <select id="filterBulan">
-        <option value="">🗓️ Semua Bulan</option>
-      </select>
-      <select id="filterPenggilingan">
-        <option value="">🏭 Semua Penggilingan</option>
-      </select>
+      <select id="filterBulan"><option value="">🗓️ Semua Bulan</option></select>
+      <select id="filterPenggilingan"><option value="">🏭 Semua Penggilingan</option></select>
       <input type="text" id="search" placeholder="🔍 Cari data...">
     </div>
 
@@ -148,9 +122,9 @@
     <div id="total-container" class="total-box"></div>
   </div>
 
-  <!-- jsPDF & SheetJS -->
+  <!-- JS Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
@@ -172,42 +146,25 @@
     function getNamaBulan(dateStr) {
       const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
       const d = new Date(dateStr);
-      if (isNaN(d)) return "Tidak diketahui";
-      return bulan[d.getMonth()] + " " + d.getFullYear();
+      return isNaN(d) ? "Tidak diketahui" : bulan[d.getMonth()] + " " + d.getFullYear();
     }
 
     function populateFilters(data) {
       const rows = data.slice(1);
-      const bulanSet = new Set();
-      const penggilinganSet = new Set();
-      rows.forEach(r => {
-        const bulan = getNamaBulan(r[0]);
-        bulanSet.add(bulan);
-        penggilinganSet.add(r[1]);
-      });
-
-      const bulanSelect = document.getElementById("filterBulan");
-      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
-      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
-
-      const penggSelect = document.getElementById("filterPenggilingan");
-      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
-      penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
+      const bulanSet = new Set(), penggSet = new Set();
+      rows.forEach(r => { bulanSet.add(getNamaBulan(r[0])); penggSet.add(r[1]); });
+      document.getElementById("filterBulan").innerHTML = `<option value="">🗓️ Semua Bulan</option>${[...bulanSet].map(b=>`<option>${b}</option>`).join("")}`;
+      document.getElementById("filterPenggilingan").innerHTML = `<option value="">🏭 Semua Penggilingan</option>${[...penggSet].map(p=>`<option>${p}</option>`).join("")}`;
     }
 
     function getFilteredRows() {
       const rows = allData.slice(1);
-      const searchValue = document.getElementById("search").value.toLowerCase();
-      const selectedBulan = document.getElementById("filterBulan").value;
-      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
-
-      return rows.filter(row => {
-        const bulan = getNamaBulan(row[0]);
-        const penggilingan = row[1];
-        const cocokBulan = !selectedBulan || bulan === selectedBulan;
-        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
-        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
-        return cocokBulan && cocokPenggilingan && cocokSearch;
+      const search = document.getElementById("search").value.toLowerCase();
+      const bulan = document.getElementById("filterBulan").value;
+      const pengg = document.getElementById("filterPenggilingan").value;
+      return rows.filter(r => {
+        const b = getNamaBulan(r[0]);
+        return (!bulan || b === bulan) && (!pengg || r[1] === pengg) && r.join(" ").toLowerCase().includes(search);
       });
     }
 
@@ -216,63 +173,45 @@
       const header = allData[0];
       const rows = getFilteredRows();
       let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
-
-      rows.forEach((row, i) => {
-        html += "<tr>";
-        row.forEach(cell => html += `<td>${cell}</td>`);
-        html += `<td><button class="btn-danger" onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
+      rows.forEach((r,i)=>{
+        html += `<tr>${r.map(c=>`<td>${c}</td>`).join("")}<td><button class="btn-danger" onclick="hapusData(${i+2})">Hapus</button></td></tr>`;
       });
-
       html += "</table>";
       document.getElementById("data-container").innerHTML = html;
 
-      // Hitung total
-      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
-      rows.forEach(r => {
-        totalGKP += parseFloat(r[4]) || 0;
-        totalGKG += parseFloat(r[8]) || 0;
-        totalBeras += parseFloat(r[12]) || 0;
-        totalProduksi += parseFloat(r[17]) || 0;
-      });
-
-      const ton = n => (n / 1000).toFixed(2);
+      let totalGKP=0,totalGKG=0,totalBeras=0,totalProduksi=0;
+      rows.forEach(r=>{totalGKP+=+r[4]||0;totalGKG+=+r[8]||0;totalBeras+=+r[12]||0;totalProduksi+=+r[17]||0;});
+      const ton=n=>(n/1000).toFixed(2);
       document.getElementById("total-container").innerHTML =
-        rows.length > 0
-        ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton`
-        : "";
+        rows.length ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton` : "";
     }
 
     async function hapusData(row) {
       if (!confirm("Yakin ingin menghapus baris ini?")) return;
       const formData = new FormData();
-      formData.append("action", "hapus");
-      formData.append("row", row);
-      await fetch(url, { method: "POST", body: formData });
+      formData.append("action","hapus"); formData.append("row",row);
+      await fetch(url,{method:"POST",body:formData});
       loadData();
     }
 
-    function printTable() {
-      window.print();
-    }
+    function printTable(){ window.print(); }
 
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
-      const element = document.querySelector(".content");
-      const canvas = await html2canvas(element, { scale: 1 });
-      const img = canvas.toDataURL("image/png");
-      const width = doc.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-      doc.addImage(img, "PNG", 0, 0, width, height);
+      const doc = new jsPDF("landscape");
+      const table = document.querySelector("table");
+      const headers = [...table.querySelectorAll("th")].map(th=>th.textContent);
+      const data = [...table.querySelectorAll("tr")]
+        .slice(1)
+        .map(tr=>[...tr.querySelectorAll("td")].slice(0,-1).map(td=>td.textContent));
+      doc.autoTable({ head: [headers], body: data, styles: { fontSize: 7 } });
       doc.save("Laporan_Stok_Harga.pdf");
     }
 
     function downloadExcel() {
-      const rows = getFilteredRows();
-      const header = allData[0];
-      const data = [header, ...rows];
-      const ws = XLSX.utils.aoa_to_sheet(data);
+      const table = document.querySelector("table");
       const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(table);
       XLSX.utils.book_append_sheet(wb, ws, "Laporan");
       XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
     }
