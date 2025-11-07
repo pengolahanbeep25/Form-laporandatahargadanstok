@@ -44,14 +44,16 @@
       font-size: 14px;
       background: white;
     }
+    select { cursor: pointer; }
     input[type="text"] { width: 200px; }
+
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
       margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      min-width: 900px;
+      min-width: 800px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -60,7 +62,10 @@
       text-align: left;
       white-space: nowrap;
     }
-    th { background: #2d6a4f; color: white; }
+    th {
+      background: #2d6a4f;
+      color: white;
+    }
     tr:nth-child(even) { background: #f2f2f2; }
     button, .btn-action {
       background: #2d6a4f;
@@ -83,6 +88,7 @@
     }
     .btn-danger { background: #d9534f; }
     .btn-danger:hover { background: #c9302c; }
+
     .total-box {
       margin-top: 15px;
       font-weight: 600;
@@ -94,16 +100,25 @@
       border-radius: 6px;
       width: fit-content;
     }
+
+    @media (max-width: 768px) {
+      table { font-size: 12px; }
+      th, td { padding: 6px; }
+      input[type="text"] { width: 150px; }
+      .action-bar { justify-content: center; }
+    }
+
     @media print {
       .filter-container, .action-bar, button { display: none; }
-      body { background: none; }
-      .content { box-shadow: none; }
+      body { background: none; padding: 0; }
+      .content { box-shadow: none; overflow: visible; }
+      table { width: 100%; page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
     }
   </style>
 </head>
 <body>
   <header><h2>📊 Data Laporan Stok & Harga</h2></header>
-
   <div class="content">
     <div class="filter-container">
       <select id="filterBulan"><option value="">🗓️ Semua Bulan</option></select>
@@ -122,9 +137,8 @@
     <div id="total-container" class="total-box"></div>
   </div>
 
-  <!-- JS Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
@@ -146,25 +160,39 @@
     function getNamaBulan(dateStr) {
       const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
       const d = new Date(dateStr);
-      return isNaN(d) ? "Tidak diketahui" : bulan[d.getMonth()] + " " + d.getFullYear();
+      if (isNaN(d)) return "Tidak diketahui";
+      return bulan[d.getMonth()] + " " + d.getFullYear();
     }
 
     function populateFilters(data) {
       const rows = data.slice(1);
-      const bulanSet = new Set(), penggSet = new Set();
-      rows.forEach(r => { bulanSet.add(getNamaBulan(r[0])); penggSet.add(r[1]); });
-      document.getElementById("filterBulan").innerHTML = `<option value="">🗓️ Semua Bulan</option>${[...bulanSet].map(b=>`<option>${b}</option>`).join("")}`;
-      document.getElementById("filterPenggilingan").innerHTML = `<option value="">🏭 Semua Penggilingan</option>${[...penggSet].map(p=>`<option>${p}</option>`).join("")}`;
+      const bulanSet = new Set();
+      const penggilinganSet = new Set();
+      rows.forEach(r => {
+        const bulan = getNamaBulan(r[0]);
+        bulanSet.add(bulan);
+        penggilinganSet.add(r[1]);
+      });
+      const bulanSelect = document.getElementById("filterBulan");
+      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
+      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
+      const penggSelect = document.getElementById("filterPenggilingan");
+      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
+      penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
     function getFilteredRows() {
       const rows = allData.slice(1);
-      const search = document.getElementById("search").value.toLowerCase();
-      const bulan = document.getElementById("filterBulan").value;
-      const pengg = document.getElementById("filterPenggilingan").value;
-      return rows.filter(r => {
-        const b = getNamaBulan(r[0]);
-        return (!bulan || b === bulan) && (!pengg || r[1] === pengg) && r.join(" ").toLowerCase().includes(search);
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      const selectedBulan = document.getElementById("filterBulan").value;
+      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
+      return rows.filter(row => {
+        const bulan = getNamaBulan(row[0]);
+        const penggilingan = row[1];
+        const cocokBulan = !selectedBulan || bulan === selectedBulan;
+        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
+        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
+        return cocokBulan && cocokPenggilingan && cocokSearch;
       });
     }
 
@@ -173,45 +201,58 @@
       const header = allData[0];
       const rows = getFilteredRows();
       let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
-      rows.forEach((r,i)=>{
-        html += `<tr>${r.map(c=>`<td>${c}</td>`).join("")}<td><button class="btn-danger" onclick="hapusData(${i+2})">Hapus</button></td></tr>`;
+      rows.forEach((row, i) => {
+        html += "<tr>";
+        row.forEach(cell => html += `<td>${cell}</td>`);
+        html += `<td><button class="btn-danger" onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
       });
       html += "</table>";
       document.getElementById("data-container").innerHTML = html;
 
-      let totalGKP=0,totalGKG=0,totalBeras=0,totalProduksi=0;
-      rows.forEach(r=>{totalGKP+=+r[4]||0;totalGKG+=+r[8]||0;totalBeras+=+r[12]||0;totalProduksi+=+r[17]||0;});
-      const ton=n=>(n/1000).toFixed(2);
+      // total
+      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
+      rows.forEach(r => {
+        totalGKP += parseFloat(r[4]) || 0;
+        totalGKG += parseFloat(r[8]) || 0;
+        totalBeras += parseFloat(r[12]) || 0;
+        totalProduksi += parseFloat(r[17]) || 0;
+      });
+      const ton = n => (n / 1000).toFixed(2);
       document.getElementById("total-container").innerHTML =
-        rows.length ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton` : "";
+        rows.length > 0
+        ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton`
+        : "";
     }
 
     async function hapusData(row) {
       if (!confirm("Yakin ingin menghapus baris ini?")) return;
       const formData = new FormData();
-      formData.append("action","hapus"); formData.append("row",row);
-      await fetch(url,{method:"POST",body:formData});
+      formData.append("action", "hapus");
+      formData.append("row", row);
+      await fetch(url, { method: "POST", body: formData });
       loadData();
     }
 
-    function printTable(){ window.print(); }
+    function printTable() { window.print(); }
 
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF("landscape");
+      const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       const table = document.querySelector("table");
-      const headers = [...table.querySelectorAll("th")].map(th=>th.textContent);
-      const data = [...table.querySelectorAll("tr")]
-        .slice(1)
-        .map(tr=>[...tr.querySelectorAll("td")].slice(0,-1).map(td=>td.textContent));
-      doc.autoTable({ head: [headers], body: data, styles: { fontSize: 7 } });
+      const totalText = document.getElementById("total-container").textContent;
+      doc.autoTable({ html: table, startY: 20, styles: { fontSize: 8 } });
+      doc.text(totalText, 40, doc.lastAutoTable.finalY + 30);
       doc.save("Laporan_Stok_Harga.pdf");
     }
 
     function downloadExcel() {
-      const table = document.querySelector("table");
+      const header = allData[0];
+      const rows = getFilteredRows();
+      const totalText = document.getElementById("total-container").textContent;
+      const data = [header, ...rows, [], [totalText]];
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws["!cols"] = header.map(() => ({ wch: 15 }));
       const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(table);
       XLSX.utils.book_append_sheet(wb, ws, "Laporan");
       XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
     }
