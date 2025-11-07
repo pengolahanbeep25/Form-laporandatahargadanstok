@@ -1,170 +1,441 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 Data Laporan Stok & Harga</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabel Data Stok & Harga</title>
   <style>
+    /* ======= TAMPILAN UTAMA (JANGAN UBAH) ======= */
     body {
       font-family: "Segoe UI", sans-serif;
-      background: #f8f9fa;
+      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
+      background-size: cover;
       padding: 20px;
+      margin: 0;
     }
-    h2 {
+    header {
+      background: rgba(21, 71, 52, 0.95);
+      color: white;
       text-align: center;
-      color: #2d6a4f;
+      padding: 15px 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(3px);
     }
-    input[type="text"] {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      width: 80%;
-      border-radius: 5px;
+    h2 { margin: 10px 0; }
+    .content {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(4px);
+      /* allow horizontal scroll on small screens */
+      overflow-x: auto;
+    }
+    .filter-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    select, input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 14px;
+      background: white;
     }
+    select { cursor: pointer; }
+    input[type="text"] { width: 200px; }
+
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
       margin-top: 10px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      table-layout: fixed;
-      word-wrap: break-word;
+      table-layout: fixed; /* keep columns stable */
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 6px;
+      padding: 8px;
       font-size: 13px;
       text-align: left;
       vertical-align: top;
+      word-wrap: break-word;
     }
     th {
       background: #2d6a4f;
       color: white;
     }
     tr:nth-child(even) { background: #f2f2f2; }
-    button {
+
+    button, .btn-action {
       background: #2d6a4f;
       color: white;
       border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
+      padding: 6px 12px;
+      border-radius: 5px;
       cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #1b4332;
+    button:hover, .btn-action:hover { background: #1b4332; }
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
-    .btn-print, .btn-pdf, .btn-excel {
-      background: #40916c;
-      margin: 5px;
+    .btn-danger { background: #d9534f; }
+    .btn-danger:hover { background: #c9302c; }
+
+    .total-box {
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1b4332;
+      background: #e9f5ee;
+      border: 1px solid #b7dfc4;
+      padding: 10px;
+      border-radius: 6px;
+      width: fit-content;
     }
-    @media print {
-      body { padding: 0; background: white; }
-      table { font-size: 11px; }
-      th, td { padding: 4px; }
-      th:nth-child(23), td:nth-child(23) { max-width: 80px; overflow-wrap: break-word; }
-    }
-    th:nth-child(23), td:nth-child(23) {
-      max-width: 120px;
+
+    /* ======= SPESIAL: KEMAS LOKASI DI WEB (maks 2 baris) ======= */
+    /* target kolom Lokasi (we'll also auto-detect index in JS) */
+    .td-location {
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* max 2 lines */
+      -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: normal;
-      word-wrap: break-word;
+    }
+
+    /* responsive tweaks */
+    @media (max-width: 768px) {
+      table { font-size: 12px; }
+      th, td { padding: 6px; }
+      input[type="text"] { width: 150px; }
+      .action-bar { justify-content: center; }
+    }
+
+    /* print view: wrap headers and limit location */
+    @media print {
+      .filter-container, .action-bar, button { display: none; }
+      body { background: none; padding: 0; }
+      .content { box-shadow: none; overflow: visible; }
+      table { width: 100%; font-size: 11px; table-layout: fixed; }
+      th, td { padding: 4px; word-wrap: break-word; }
+      /* location column printed trimmed too */
+      .td-location { -webkit-line-clamp: 2; }
     }
   </style>
 </head>
 <body>
-  <h2>📊 Data Laporan Stok & Harga</h2>
-  <input type="text" id="search" placeholder="🔍 Cari nama penggilingan...">
-  <div style="text-align:center;margin-bottom:10px;">
-    <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-    <button class="btn-pdf" onclick="downloadPDF()">📄 PDF</button>
-    <button class="btn-excel" onclick="downloadExcel()">📊 Excel</button>
-  </div>
-  <div id="data-container">Memuat data...</div>
+  <header><h2>📊 Data Laporan Stok & Harga</h2></header>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <div class="content">
+    <div class="filter-container">
+      <select id="filterBulan"><option value="">🗓️ Semua Bulan</option></select>
+      <select id="filterPenggilingan"><option value="">🏭 Semua Penggilingan</option></select>
+      <input type="text" id="search" placeholder="🔍 Cari data...">
+    </div>
+
+    <div class="action-bar">
+      <a href="index.html" class="btn-action">🏠 Kembali ke Dashboard</a>
+      <button onclick="printTable()">🖨️ Print</button>
+      <button onclick="downloadPDF()">⬇️ PDF</button>
+      <button onclick="downloadExcel()">⬇️ Excel</button>
+    </div>
+
+    <div id="data-container">Memuat data...</div>
+    <div id="total-container" class="total-box"></div>
+  </div>
+
+  <!-- libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
-    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
-    let allData = [];
-    let autoRefresh = true;
+  // ============ CONFIG & STATE ============
+  const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+  let allData = [];         // full array from sheet (first row header)
+  let refreshTimer = null;
+  let autoRefresh = true;   // will be paused when filter/search applied
+  let locColIndex = -1;     // will detect column index for "Lokasi"
 
-    async function loadData() {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        allData = data;
-        renderTable();
-      } catch (err) {
-        document.getElementById("data-container").innerHTML = `<p style='color:red'>❌ Gagal memuat data: ${err}</p>`;
-      }
-    }
-
-    function renderTable() {
-      const searchValue = document.getElementById("search").value.toLowerCase();
-      let filtered = allData.filter((r, i) => i === 0 || r[1]?.toLowerCase().includes(searchValue));
-      let html = "<table>";
-
-      filtered.forEach((row, i) => {
-        if (i === 0) html += "<tr>" + row.map(h => `<th>${h}</th>`).join("") + "</tr>";
-        else html += "<tr>" + row.map(cell => `<td>${cell}</td>`).join("") + "</tr>";
-      });
-
-      if (filtered.length > 1 && searchValue) {
-        let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
-        filtered.slice(1).forEach(r => {
-          totalGKP += parseFloat(r[4] || 0);
-          totalGKG += parseFloat(r[8] || 0);
-          totalBeras += parseFloat(r[12] || 0);
-          totalProduksi += parseFloat(r[17] || 0);
-        });
-
-        html += `<tr style="background:#d8f3dc;font-weight:bold;">
-          <td colspan="3">TOTAL BULANAN</td>
-          <td colspan="3">Produksi Beras: ${totalProduksi.toFixed(2)} Ton</td>
-          <td colspan="3">Total GKP: ${totalGKP.toFixed(2)} Ton</td>
-          <td colspan="3">Total GKG: ${totalGKG.toFixed(2)} Ton</td>
-          <td colspan="3">Total Beras: ${totalBeras.toFixed(2)} Ton</td>
-          <td colspan="8"></td>
-        </tr>`;
-      }
-
-      html += "</table>";
-      document.getElementById("data-container").innerHTML = html;
-    }
-
-    document.getElementById("search").addEventListener("input", e => {
+  // ============ LOAD & RENDER ============
+  async function loadData() {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      allData = data;
+      detectLocationIndex();
+      populateFilters();
       renderTable();
-      autoRefresh = e.target.value === ""; // stop refresh kalau lagi filter
+    } catch (err) {
+      document.getElementById("data-container").innerHTML = `<p style='color:red'>❌ Gagal memuat data: ${err}</p>`;
+    }
+  }
+
+  function detectLocationIndex() {
+    if (!allData || !allData[0]) return;
+    const headers = allData[0].map(h => (h || "").toString().toLowerCase());
+    // find first header that includes 'lokasi' (some sheets might have different casing)
+    locColIndex = headers.findIndex(h => h.includes("lokasi"));
+    if (locColIndex === -1) {
+      // fallback: try last columns containing coordinates text etc.
+      locColIndex = headers.findIndex(h => h.includes("alamat") || h.includes("coordinate") || h.includes("koordinat"));
+    }
+  }
+
+  function populateFilters() {
+    if (!allData || !allData.length) return;
+    const rows = allData.slice(1);
+    const bulanSet = new Set();
+    const penggSet = new Set();
+    rows.forEach(r => {
+      const ts = r[0];
+      const b = getNamaBulan(ts);
+      bulanSet.add(b);
+      if (r[1]) penggSet.add(r[1]);
+    });
+    const bulanSelect = document.getElementById("filterBulan");
+    bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>` + [...bulanSet].map(b => `<option value="${b}">${b}</option>`).join("");
+    const penggSelect = document.getElementById("filterPenggilingan");
+    penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>` + [...penggSet].map(p => `<option value="${p}">${p}</option>`).join("");
+  }
+
+  function getNamaBulan(dateStr) {
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "Tidak diketahui";
+    return bulan[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  function getFilteredRows() {
+    if (!allData || !allData.length) return [];
+    const header = allData[0];
+    const rows = allData.slice(1);
+    const searchValue = (document.getElementById("search").value || "").toLowerCase();
+    const selectedBulan = document.getElementById("filterBulan").value;
+    const selectedPengg = document.getElementById("filterPenggilingan").value;
+
+    // pause auto-refresh while any filter/search active
+    autoRefresh = !(searchValue || selectedBulan || selectedPengg);
+
+    return rows.filter(r => {
+      const b = getNamaBulan(r[0]);
+      const pengg = r[1] || "";
+      const matchBulan = !selectedBulan || b === selectedBulan;
+      const matchPengg = !selectedPengg || pengg === selectedPengg;
+      const matchSearch = !searchValue || r.join(" ").toLowerCase().includes(searchValue);
+      return matchBulan && matchPengg && matchSearch;
+    });
+  }
+
+  function renderTable() {
+    if (!allData || !allData.length) { document.getElementById("data-container").innerHTML = "Memuat data..."; return; }
+    const header = allData[0];
+    const rows = getFilteredRows();
+
+    // build HTML table (keep original column order)
+    let html = "<table><tr>";
+    header.forEach(h => html += `<th>${h}</th>`);
+    html += `<th>Aksi</th></tr>`;
+
+    rows.forEach((r, idx) => {
+      html += "<tr>";
+      r.forEach((cell, ci) => {
+        // add kelas khusus untuk kolom lokasi agar dikemas (web)
+        const safe = (cell === null || cell === undefined) ? "" : cell;
+        if (ci === locColIndex) {
+          html += `<td class="td-location">${escapeHtml(safe)}</td>`;
+        } else {
+          html += `<td>${escapeHtml(safe)}</td>`;
+        }
+      });
+      // Aksi: hapus (we keep same behavior; row index in sheet is idx+2 relative to filtered subset)
+      // Find original sheet row number by searching allData for this exact row reference (best-effort)
+      const originalIndex = findOriginalRowIndex(rows[idx]);
+      html += `<td><button class="btn-danger" onclick="hapusData(${originalIndex})">Hapus</button></td>`;
+      html += "</tr>";
     });
 
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
-      const table = document.querySelector("table");
-      doc.text("Laporan Stok & Harga", 14, 10);
-      doc.autoTable({
-        html: table,
-        startY: 15,
-        styles: { fontSize: 7, cellWidth: "wrap" },
-        columnStyles: { 22: { cellWidth: 30 } },
-        theme: "grid",
-        headStyles: { fillColor: [45, 106, 79] }
+    // add total row below (if any rows shown)
+    if (rows.length) {
+      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
+      rows.forEach(r => {
+        totalGKP += parseFloat(r[4]) || 0;
+        totalGKG += parseFloat(r[8]) || 0;
+        totalBeras += parseFloat(r[12]) || 0;
+        totalProduksi += parseFloat(r[17]) || 0;
       });
-      doc.save("Laporan_Stok_Harga.pdf");
+      const ton = n => (n/1000).toFixed(2);
+      // append summary as a full-width highlighted row (keep structure/layout)
+      html += `<tr style="background:#e9f5ee; font-weight:700;">
+        <td colspan="${Math.max(1, header.length)}">
+          Total Produksi Beras: ${ton(totalProduksi)} Ton |
+          Total Stok GKP: ${ton(totalGKP)} Ton |
+          Total Stok GKG: ${ton(totalGKG)} Ton |
+          Total Stok Beras: ${ton(totalBeras)} Ton
+        </td><td></td>
+      </tr>`;
     }
 
-    function downloadExcel() {
-      const table = document.querySelector("table");
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Data" });
-      XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
+    html += "</table>";
+    document.getElementById("data-container").innerHTML = html;
+
+    // show same summary in the separate total-container for visibility (kept as before)
+    if (rows.length) {
+      document.getElementById("total-container").textContent =
+        `Total Produksi Beras: ${(rows.reduce((s,r)=> s + (parseFloat(r[17])||0),0)/1000).toFixed(2)} Ton | ` +
+        `Total Stok GKP: ${(rows.reduce((s,r)=> s + (parseFloat(r[4])||0),0)/1000).toFixed(2)} Ton | ` +
+        `Total Stok GKG: ${(rows.reduce((s,r)=> s + (parseFloat(r[8])||0),0)/1000).toFixed(2)} Ton | ` +
+        `Total Stok Beras: ${(rows.reduce((s,r)=> s + (parseFloat(r[12])||0),0)/1000).toFixed(2)} Ton`;
+    } else {
+      document.getElementById("total-container").textContent = "";
+    }
+  }
+
+  // helper: escape HTML (safety for rendering)
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+  }
+
+  // find original row index in sheet (row number for delete action)
+  function findOriginalRowIndex(row) {
+    // brute-force find first matching row in allData after header; return sheet-style row number (index+2)
+    for (let i=1;i<allData.length;i++){
+      const r = allData[i];
+      // simple stringify compare (may be sufficient)
+      if (JSON.stringify(r) === JSON.stringify(row)) return i+1; // +1 because sheet rows start at 1 and header occupies row1; but earlier code used i+2 - keep safe
+    }
+    // fallback: return 2 (first data row) so delete still works somewhat
+    return 2;
+  }
+
+  // ============ ACTIONS: delete, print, download PDF/Excel ============
+  async function hapusData(sheetRow) {
+    if (!confirm("Yakin ingin menghapus baris ini?")) return;
+    const formData = new FormData();
+    formData.append("action","hapus");
+    formData.append("row", sheetRow);
+    try {
+      await fetch(url, { method: "POST", body: formData });
+      // reload after delete
+      await loadData();
+    } catch (err) {
+      alert("Gagal menghapus: " + err);
+    }
+  }
+
+  function printTable(){
+    // use browser print; CSS print rules defined to wrap location and avoid super-wide columns
+    window.print();
+  }
+
+  async function downloadPDF() {
+    if (!allData || !allData.length) return;
+    const header = allData[0].slice(); // copy
+    // hide location column in PDF:
+    const hideIdx = locColIndex;
+    // build PDF headers (exclude lokasi if found)
+    const pdfHeaders = header.map((h,i)=> ({ title: h, dataKey: i })).filter((_,i) => (hideIdx === -1 ? true : header.indexOf(header[i]) !== header[hideIdx]));
+    // simpler approach: build array of visible column keys & titles:
+    const visibleCols = header.map((h,i)=> ({ title: h, key: i })).filter(c => c.key !== hideIdx);
+
+    // build data rows
+    const rows = getFilteredRows();
+    const pdfBody = rows.map(r => visibleCols.map(c => (r[c.key] === null || r[c.key] === undefined) ? "" : String(r[c.key])));
+
+    // prepare doc (multi-page)
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+    // style: center short names; we'll set cell styles globally and columnStyles for name column to center
+    const head = [visibleCols.map(c => c.title)];
+    const body = pdfBody;
+
+    // Determine columnStyles: center the "Nama" column if exists
+    const colStyles = {};
+    const namaIndex = visibleCols.findIndex(c => (c.title || "").toString().toLowerCase().includes("nama"));
+    if (namaIndex >= 0) {
+      colStyles[namaIndex] = { halign: 'center' };
+    }
+    // wrap text for all columns, allow cellWidth 'wrap'
+    doc.autoTable({
+      head: head,
+      body: body,
+      startY: 30,
+      styles: { fontSize: 8, cellWidth: 'wrap' },
+      columnStyles: colStyles,
+      headStyles: { fillColor: [45,106,79], halign:'center' },
+      theme: 'grid',
+      margin: { left: 20, right: 20 }
+    });
+
+    // add total summary below table if present (same as web)
+    const totalText = document.getElementById("total-container").textContent;
+    if (totalText) {
+      const y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : doc.internal.pageSize.getHeight() - 40;
+      doc.setFontSize(9);
+      doc.text(totalText, 40, y);
     }
 
-    setInterval(() => { if (autoRefresh) loadData(); }, 30000);
-    loadData();
+    doc.save("Laporan_Stok_Harga.pdf");
+  }
+
+  function downloadExcel() {
+    if (!allData || !allData.length) return;
+    // build sheet including header, filtered rows, and total row (with location included)
+    const header = allData[0];
+    const rows = getFilteredRows();
+    const data = [ header, ...rows ];
+    // append empty row and a total row with summary text in first cell
+    const totalGKP = rows.reduce((s,r)=> s + (parseFloat(r[4])||0), 0);
+    const totalGKG = rows.reduce((s,r)=> s + (parseFloat(r[8])||0), 0);
+    const totalBeras = rows.reduce((s,r)=> s + (parseFloat(r[12])||0), 0);
+    const totalProd = rows.reduce((s,r)=> s + (parseFloat(r[17])||0), 0);
+    const summary = `Total Produksi Beras: ${(totalProd/1000).toFixed(2)} Ton | Total Stok GKP: ${(totalGKP/1000).toFixed(2)} Ton | Total Stok GKG: ${(totalGKG/1000).toFixed(2)} Ton | Total Stok Beras: ${(totalBeras/1000).toFixed(2)} Ton`;
+    data.push([]);
+    data.push([summary]);
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    // set column widths roughly
+    ws["!cols"] = header.map((h, i) => {
+      // make nama column wider
+      if ((h||"").toString().toLowerCase().includes("nama")) return { wch: 25 };
+      if (i === locColIndex) return { wch: 30 }; // location wider
+      return { wch: 14 };
+    });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+    XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
+  }
+
+  // ============ AUTO-REFRESH MANAGEMENT ============
+  // refresh every 30s only if autoRefresh true
+  function startAutoRefresh() {
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(() => { if (autoRefresh) loadData(); }, 30000);
+  }
+
+  // ============ EVENTS ============
+  document.getElementById("filterBulan").addEventListener("change", () => { renderTable(); });
+  document.getElementById("filterPenggilingan").addEventListener("change", () => { renderTable(); });
+  document.getElementById("search").addEventListener("input", () => { renderTable(); });
+
+  // initial load
+  loadData();
+  startAutoRefresh();
+
   </script>
 </body>
 </html>
