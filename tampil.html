@@ -51,10 +51,6 @@
       background-color: #3498db;
       color: white;
     }
-    .print {
-      background-color: #2ecc71;
-      color: white;
-    }
     .total-row {
       background-color: #f1f1f1;
       font-weight: bold;
@@ -68,35 +64,34 @@
       margin-bottom: 10px;
       cursor: pointer;
     }
-    @media (max-width: 768px) {
-      table {
-        font-size: 12px;
-      }
-      td.lokasi {
-        max-width: 120px;
-      }
-    }
 
     @media print {
       @page {
         size: legal landscape;
         margin: 10mm;
       }
-      body {
-        background: white;
-      }
-      .filter, .back-btn, .print, .download {
+      .filter, .back-btn {
         display: none;
       }
       table {
         width: 100%;
-        border: 1px solid #000;
-        border-collapse: collapse;
         font-size: 12px;
       }
       th, td {
-        border: 1px solid #000;
-        padding: 5px;
+        padding: 4px;
+        word-wrap: break-word;
+      }
+      td.lokasi {
+        max-width: 150px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 12px;
+      }
+      td.lokasi {
+        max-width: 120px;
       }
     }
   </style>
@@ -110,7 +105,7 @@
     <label for="filterNama">Filter Nama Petani: </label>
     <input type="text" id="filterNama" oninput="filterNama()" placeholder="Ketik nama...">
     <button class="download" onclick="downloadExcel()">Download Excel</button>
-    <button class="print" onclick="window.print()">Print</button>
+    <button class="download" onclick="window.print()">Print</button>
   </div>
 
   <table id="dataTable">
@@ -155,9 +150,7 @@
     </tfoot>
   </table>
 
-  <!-- XLSX Library -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     const inputFilter = document.getElementById("filterNama");
     const tbody = document.getElementById("tableBody");
@@ -194,22 +187,23 @@
 
     function downloadExcel() {
       const table = document.getElementById("dataTable");
-      const clone = table.cloneNode(true);
+      const wb = XLSX.utils.book_new();
 
-      // Hapus baris yang disembunyikan
-      Array.from(clone.querySelectorAll("tbody tr")).forEach(row => {
-        if (row.style.display === "none") row.remove();
+      const visibleRows = Array.from(table.querySelectorAll("tr")).filter(row =>
+        row.style.display !== "none" || row.parentNode.tagName === "TFOOT"
+      );
+
+      const data = visibleRows.map(row => {
+        const cells = row.querySelectorAll("th, td");
+        return Array.from(cells).map(cell => cell.innerText);
       });
 
-      // Konversi ke sheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(clone);
-      XLSX.utils.book_append_sheet(wb, ws, "Data");
-
-      // Simpan file Excel
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, "Data Stok Harga");
       XLSX.writeFile(wb, "Data_Stok_Harga.xlsx");
     }
 
+    // Hitung total awal
     hitungTotal();
   </script>
 </body>
