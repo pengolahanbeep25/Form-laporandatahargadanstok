@@ -101,7 +101,7 @@
     © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
 
-  <script>
+<script>
 if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
 
 function logout() {
@@ -114,26 +114,26 @@ const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzd
 // --- Fungsi bantu ubah format timestamp jadi tanggal normal
 function parseTanggal(ts) {
   if (!ts) return null;
-  ts = ts.toString().trim().toLowerCase();
+  ts = ts.toString().trim();
 
-  // Kalau format 10/11/2025 11:34:43
+  // Format: 10/11/2025 11:02:14
   if (ts.includes("/")) {
-    const parts = ts.split(/[ /:]+/);
-    const [d, m, y] = parts;
-    return `${parseInt(d)}-${parseInt(m)}-${y}`;
+    const [tanggalPart] = ts.split(" ");
+    const [d, m, y] = tanggalPart.split("/");
+    return { d: parseInt(d), m: parseInt(m), y: parseInt(y) };
   }
 
-  // Kalau format 24 September 2025
+  // Format: 10 November 2025
   const bulanMap = {
     januari: 1, februari: 2, maret: 3, april: 4, mei: 5, juni: 6,
     juli: 7, agustus: 8, september: 9, oktober: 10, november: 11, desember: 12
   };
-  const parts = ts.split(" ");
+  const parts = ts.toLowerCase().split(" ");
   if (parts.length >= 3) {
     const d = parseInt(parts[0]);
     const b = bulanMap[parts[1]] || 0;
-    const y = parts[2];
-    if (b) return `${d}-${b}-${y}`;
+    const y = parseInt(parts[2]);
+    return { d, m: b, y };
   }
 
   return null;
@@ -166,11 +166,10 @@ async function loadData() {
       const nama = (row[colNama] || "").trim();
       const stok = parseFloat(row[colStok]) || 0;
       const harga = parseFloat(row[colHarga]) || 0;
-      const ts = parseTanggal(row[colTimestamp]);
+      const tsObj = parseTanggal(row[colTimestamp]);
 
-      if (!ts || !nama) return;
-      const [d, m, y] = ts.split("-").map(Number);
-      if (d === hari && m === bulan && y === tahun && daftarPetani.includes(nama)) {
+      if (!tsObj || !nama) return;
+      if (tsObj.d === hari && tsObj.m === bulan && tsObj.y === tahun && daftarPetani.includes(nama)) {
         dataPetani[nama] = stok;
         if (harga > 0) {
           totalHarga += harga;
@@ -207,6 +206,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
