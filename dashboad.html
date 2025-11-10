@@ -100,107 +100,92 @@
   <footer>
     © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
-
 <script>
-  if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
-  function logout() {
-    localStorage.removeItem("loginUser");
-    window.location.href = "index.html";
-  }
+if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
+function logout() {
+  localStorage.removeItem("loginUser");
+  window.location.href = "index.html";
+}
 
-  const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
 
-  async function loadData() {
-    try {
-      const res = await fetch(url + "?t=" + Date.now());
-      const raw = await res.json();
-      const header = raw[0];
-      const body = raw.slice(1);
+async function loadData() {
+  try {
+    const res = await fetch(url + "?t=" + Date.now());
+    const raw = await res.json();
+    const header = raw[0];
+    const body = raw.slice(1);
 
-      const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
-      const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
-      const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
-      const colTimestamp = 0;
+    const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
+    const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
+    const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
+    const colTimestamp = 0;
 
-      const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
-      const dataPetani = {};
-      let totalHarga = 0, hitungHarga = 0;
-      daftarPetani.forEach(nama => dataPetani[nama] = null);
+    const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
+    const dataPetani = {};
+    let totalHarga = 0, hitungHarga = 0;
+    daftarPetani.forEach(nama => dataPetani[nama] = null);
 
-      const today = new Date();
-      const todayStr = today.toISOString().split("T")[0]; // yyyy-mm-dd
+    const bulanMap = [
+      "januari", "februari", "maret", "april", "mei", "juni",
+      "juli", "agustus", "september", "oktober", "november", "desember"
+    ];
 
-      const bulanMap = {
-        januari: "01", februari: "02", maret: "03", april: "04",
-        mei: "05", juni: "06", juli: "07", agustus: "08",
-        september: "09", oktober: "10", november: "11", desember: "12"
-      };
+    const now = new Date();
+    const hari = now.getDate().toString();
+    const bulan = bulanMap[now.getMonth()]; // nama bulan sekarang, contoh "november"
+    const shortMonth = (now.getMonth() + 1).toString().padStart(2, "0"); // contoh "11"
 
-      body.forEach(row => {
-        const nama = (row[colNama] || "").trim();
-        const stok = parseFloat(row[colStok]) || 0;
-        const harga = parseFloat(row[colHarga]) || 0;
-        let ts = (row[colTimestamp] || "").toString().trim().toLowerCase();
+    body.forEach(row => {
+      const nama = (row[colNama] || "").trim();
+      const stok = parseFloat(row[colStok]) || 0;
+      const harga = parseFloat(row[colHarga]) || 0;
+      const ts = (row[colTimestamp] || "").toString().toLowerCase();
 
-        if (!ts) return;
-
-        let dateNormalized = "";
-
-        // Format 10/11/2025
-        if (ts.includes("/")) {
-          const parts = ts.split(" ")[0].split("/");
-          if (parts.length === 3) {
-            const [dd, mm, yyyy] = parts;
-            dateNormalized = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
-          }
-        }
-        // Format 10 November 2025
-        else if (ts.match(/[a-z]/)) {
-          const parts = ts.split(" ");
-          if (parts.length >= 3) {
-            const d = parts[0].padStart(2, "0");
-            const m = bulanMap[parts[1]] || "01";
-            const y = parts[2];
-            dateNormalized = `${y}-${m}-${d}`;
-          }
-        }
-
-        if (dateNormalized === todayStr && daftarPetani.includes(nama)) {
+      // baca semua bentuk: 10/11/2025, 10 November 2025, dst
+      if (
+        ts.includes(`${hari} ${bulan}`) ||        // format "10 november"
+        ts.includes(`${hari}/${shortMonth}/`) ||  // format "10/11/2025"
+        ts.includes(`${hari}-${shortMonth}-`)     // format "10-11-2025"
+      ) {
+        if (daftarPetani.includes(nama)) {
           dataPetani[nama] = stok;
           if (harga > 0) {
             totalHarga += harga;
             hitungHarga++;
           }
         }
-      });
+      }
+    });
 
-      const container = document.getElementById("stok-list");
-      container.innerHTML = "";
+    const container = document.getElementById("stok-list");
+    container.innerHTML = "";
 
-      daftarPetani.forEach(nama => {
-        const div = document.createElement("div");
-        div.className = "petani-box";
-        if (dataPetani[nama] !== null) {
-          div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg ✅</span>`;
-        } else {
-          div.innerHTML = `<span>${nama}</span><span class="kosong">Belum update hari ini ❌</span>`;
-        }
-        container.appendChild(div);
-      });
+    daftarPetani.forEach(nama => {
+      const div = document.createElement("div");
+      div.className = "petani-box";
+      if (dataPetani[nama] !== null) {
+        div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg ✅</span>`;
+      } else {
+        div.innerHTML = `<span>${nama}</span><span class="kosong">Belum update hari ini ❌</span>`;
+      }
+      container.appendChild(div);
+    });
 
-      document.getElementById("harga-rata").textContent =
-        hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
+    document.getElementById("harga-rata").textContent =
+      hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
 
-    } catch (err) {
-      document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
-      document.getElementById("harga-rata").textContent = "-";
-      console.error(err);
-    }
+  } catch (err) {
+    document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
+    document.getElementById("harga-rata").textContent = "-";
+    console.error(err);
   }
+}
 
-  loadData();
+loadData();
 </script>
 </body>
 </html>
+
 
 
