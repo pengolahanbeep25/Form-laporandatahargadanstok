@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #b6e7c9, #88d498);
+    background: linear-gradient(135deg, #b8f1b0, #64c37d);
     margin: 0;
     padding: 0;
   }
@@ -22,7 +22,7 @@
   h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: #146c43;
+    color: #0f6b32;
   }
   .step {
     display: none;
@@ -154,13 +154,9 @@
       <label>Nama Kelompok *</label>
       <input type="text" id="nama_kelompok" required>
       <label>Provinsi *</label>
-      <select id="provinsi" required>
-        <option value="Riau" selected>Riau</option>
-      </select>
+      <select id="provinsi" required><option value="Riau" selected>Riau</option></select>
       <label>Kota/Kabupaten *</label>
-      <select id="kabupaten" required>
-        <option value="Tembilahan" selected>Tembilahan</option>
-      </select>
+      <select id="kabupaten" required><option value="Indragiri Hilir" selected>Indragiri Hilir</option></select>
       <label>Kecamatan *</label>
       <select id="kecamatan" required onchange="populateDesa()"></select>
       <label>Desa/Kelurahan *</label>
@@ -187,229 +183,51 @@
       </div>
     </div>
 
-    <!-- STEP 2: PRODUKSI -->
-    <div class="step" id="step2">
-      <h2>Produksi</h2>
-      <label>Produksi (Volume) (Kg)</label>
-      <input type="number" id="produksi_volume" oninput="hitungProduksi()">
-      <label>Produksi (Harga) (Rp)</label>
-      <input type="number" id="produksi_harga" oninput="hitungProduksi()">
-      <label>Produksi (Total) (Rp)</label>
-      <input type="number" id="produksi_total" class="auto" readonly>
-      <div class="button-group">
-        <button type="button" onclick="prevStep()">Kembali</button>
-        <button type="button" onclick="nextStep()">Lanjut</button>
-      </div>
-    </div>
-    <!-- STEP 3: BIAYA TETAP -->
-    <div class="step" id="step3">
-      <h2>Biaya Tetap</h2>
-      <h3>a) Sewa Lahan</h3>
-      <label>Volume (Ha/MT)</label>
-      <input type="number" id="sewa_volume" oninput="hitungSewa()">
-      <label>Harga (Rp)</label>
-      <input type="number" id="sewa_harga" oninput="hitungSewa()">
-      <label>Total (Rp)</label>
-      <input type="number" id="sewa_total" class="auto" readonly>
+    <!-- STEP 2–5 -->
+    <div class="step" id="step2"><h2>Produksi</h2>
+      <label>Produksi (Kg)</label><input type="number" id="produksi_volume" oninput="hitungProduksi()">
+      <label>Harga (Rp)</label><input type="number" id="produksi_harga" oninput="hitungProduksi()">
+      <label>Total (Rp)</label><input type="number" id="produksi_total" class="auto" readonly>
+      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
 
-      <h3>b) Penyusutan Alsintan</h3>
-      <label>Traktor (Rp)</label>
-      <input type="number" id="traktor" oninput="hitungPenyusutan()">
-      <label>Combine Harvester (Rp)</label>
-      <input type="number" id="combine" oninput="hitungPenyusutan()">
-      <label>Power Thresher (Rp)</label>
-      <input type="number" id="thresher" oninput="hitungPenyusutan()">
-      <label>Pompa Air (Rp)</label>
-      <input type="number" id="pompa" oninput="hitungPenyusutan()">
-      <label>Cangkul/Sabit (Rp)</label>
-      <input type="number" id="alat_tangan" oninput="hitungPenyusutan()">
-      <label>Total Penyusutan (Rp)</label>
-      <input type="number" id="penyusutan_total" class="auto" readonly>
+    <div class="step" id="step3"><h2>Biaya Tetap</h2>
+      <label>Sewa Lahan (Rp)</label><input type="number" id="sewa_total" oninput="updateRingkasan()">
+      <label>Penyusutan Alsintan (Rp)</label><input type="number" id="penyusutan_total" oninput="updateRingkasan()">
+      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
 
-      <div class="button-group">
-        <button type="button" onclick="prevStep()">Kembali</button>
-        <button type="button" onclick="nextStep()">Lanjut</button>
-      </div>
-    </div>
+    <div class="step" id="step4"><h2>Biaya Variabel</h2>
+      <label>Benih (Rp)</label><input type="number" id="benih_total" oninput="updateRingkasan()">
+      <label>Pupuk (Rp)</label><input type="number" id="pupuk_total" oninput="updateRingkasan()">
+      <label>Pestisida (Rp)</label><input type="number" id="pestisida_total" oninput="updateRingkasan()">
+      <label>Tenaga Kerja (Rp)</label><input type="number" id="upah_total" oninput="updateRingkasan()">
+      <label>Sewa Alat (Rp)</label><input type="number" id="sewaalat_total" oninput="updateRingkasan()">
+      <label>Bahan Bakar (Rp)</label><input type="number" id="bahanbakar_total" oninput="updateRingkasan()">
+      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
 
-    <!-- STEP 4: BIAYA VARIABEL -->
-    <div class="step" id="step4">
-      <h2>Biaya Variabel</h2>
-
-      <h3>a) Benih</h3>
-      <label>Volume</label>
-      <input type="number" id="benih_vol" oninput="hitungBenih()">
-      <label>Harga (Rp)</label>
-      <input type="number" id="benih_harga" oninput="hitungBenih()">
-      <label>Total (Rp)</label>
-      <input type="number" id="benih_total" class="auto" readonly>
-
-      <h3>b) Pupuk</h3>
-      <label>Pupuk Urea (Rp)</label>
-      <input type="number" id="urea" oninput="hitungPupuk()">
-      <label>Pupuk NPK (Rp)</label>
-      <input type="number" id="npk" oninput="hitungPupuk()">
-      <label>Pupuk Organik (Rp)</label>
-      <input type="number" id="organik" oninput="hitungPupuk()">
-      <label>Total Pupuk (Rp)</label>
-      <input type="number" id="pupuk_total" class="auto" readonly>
-
-      <h3>c) Pestisida</h3>
-      <label>Herbisida (Rp)</label>
-      <input type="number" id="herbisida" oninput="hitungPestisida()">
-      <label>Insektisida (Rp)</label>
-      <input type="number" id="insektisida" oninput="hitungPestisida()">
-      <label>Fungisida (Rp)</label>
-      <input type="number" id="fungisida" oninput="hitungPestisida()">
-      <label>Total Pestisida (Rp)</label>
-      <input type="number" id="pestisida_total" class="auto" readonly>
-
-      <h3>d) Tenaga Kerja</h3>
-      <label>Upah Pengolahan (Rp)</label>
-      <input type="number" id="upah_pengolahan" oninput="hitungUpah()">
-      <label>Upah Penanaman (Rp)</label>
-      <input type="number" id="upah_tanam" oninput="hitungUpah()">
-      <label>Upah Panen (Rp)</label>
-      <input type="number" id="upah_panen" oninput="hitungUpah()">
-      <label>Total Tenaga Kerja (Rp)</label>
-      <input type="number" id="upah_total" class="auto" readonly>
-
-      <h3>e) Sewa Alat/Sarana</h3>
-      <label>Traktor (Rp)</label>
-      <input type="number" id="sewa_traktor" oninput="hitungSewaAlat()">
-      <label>Pompa Air (Rp)</label>
-      <input type="number" id="sewa_pompa" oninput="hitungSewaAlat()">
-      <label>Total Sewa Alat (Rp)</label>
-      <input type="number" id="sewaalat_total" class="auto" readonly>
-
-      <h3>f) Bahan Bakar</h3>
-      <label>Solar/Bensin (Rp)</label>
-      <input type="number" id="bahanbakar" oninput="hitungBahanBakar()">
-      <label>Total Bahan Bakar (Rp)</label>
-      <input type="number" id="bahanbakar_total" class="auto" readonly>
-
-      <div class="button-group">
-        <button type="button" onclick="prevStep()">Kembali</button>
-        <button type="button" onclick="nextStep()">Lanjut</button>
-      </div>
-    </div>
-
-    <!-- STEP 5: RINGKASAN -->
-    <div class="step" id="step5">
-      <h2>Ringkasan Usaha Tani</h2>
-      <label>Total Biaya Tetap (Rp)</label>
-      <input type="number" id="biaya_tetap_total" class="auto" readonly>
-      <label>Total Biaya Variabel (Rp)</label>
-      <input type="number" id="biaya_variabel_total" class="auto" readonly>
-      <label>Total Biaya Produksi (Rp)</label>
-      <input type="number" id="biaya_produksi_total" class="auto" readonly>
-      <label>Keuntungan (Rp)</label>
-      <input type="number" id="keuntungan_usaha" class="auto" readonly>
-      <label>R/C Ratio</label>
-      <input type="number" id="rc_ratio" class="auto" readonly>
-      <label>HPP (Rp)</label>
-      <input type="number" id="hpp" class="auto" readonly>
-      <div class="button-group">
-        <button type="button" onclick="prevStep()">Kembali</button>
-        <button type="submit">Kirim</button>
-      </div>
-    </div>
+    <div class="step" id="step5"><h2>Ringkasan Usaha Tani</h2>
+      <label>Biaya Tetap (Rp)</label><input type="number" id="biaya_tetap_total" class="auto" readonly>
+      <label>Biaya Variabel (Rp)</label><input type="number" id="biaya_variabel_total" class="auto" readonly>
+      <label>Total Biaya Produksi (Rp)</label><input type="number" id="biaya_produksi_total" class="auto" readonly>
+      <label>Keuntungan (Rp)</label><input type="number" id="keuntungan_usaha" class="auto" readonly>
+      <label>R/C Ratio</label><input type="number" id="rc_ratio" class="auto" readonly>
+      <label>HPP (Rp)</label><input type="number" id="hpp" class="auto" readonly>
+      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="submit">Kirim</button></div></div>
 
   </form>
 </div>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyo4vX_a18Q97l1mX2ZhiNkyUegy_eLZIZFvP5goXw-Z_dMhArmb04CXqa1tvOywEPH/exec";
-
-// navigasi step
 let currentStep = 1;
-function showStep(n){
-  document.querySelectorAll(".step").forEach((s,i)=>{
-    s.classList.toggle("active",i===n-1);
-  });
-  document.querySelectorAll(".progressbar li").forEach((el,idx)=>{
-    el.classList.toggle("active",idx<n);
-  });
-}
+function showStep(n){document.querySelectorAll(".step").forEach((s,i)=>s.classList.toggle("active",i===n-1));
+document.querySelectorAll(".progressbar li").forEach((el,idx)=>el.classList.toggle("active",idx<n));}
 function nextStep(){if(currentStep<5){currentStep++;showStep(currentStep);}}
 function prevStep(){if(currentStep>1){currentStep--;showStep(currentStep);}}
 
-// populasi kecamatan & desa
-const dataKec = {
-  "Batang Tuaka":["Sungai Piring","Gemilang Jaya","Kuala Sebatu","Pasir Emas","Sialang Jaya","Simpang Jaya","Sungai Dusun","Sungai Junjangan","Sungai Luar","Sungai Rawa","Sungai Raya","Tanjung Siantar","Tasik Raya"],
-  "Concong":["Concong Dalam","Concong Luar","Concong Tengah","Kampung Baru","Panglima Raja","Sungai Berapit"],
-  "Enok":["Bagan Jaya","Enok","Jaya Bhakti","Pengalihan","Pusaran","Rantau Panjang","Simpang Tiga","Suhada","Sungai Ambat","Sungai Lokan","Sungai Rukam","Teluk Medan"],
-  "Gaung":["Belantaraya","Gembira","Jerambang","Kuala Lahang","Lahang Baru","Lahang Hulu","Lahang Tengah","Pungkat","Simpang Gaung","Sungai Baru","Teluk Kabung","Terusan Kempas"],
-  "Gaung Anak Serka":["Bandar Sri Gemilang","Batu Ampar","Bayas Jaya","Kuala Lahang","Teluk Sungka","Teluk Jira"],
-  "Kateman":["Air Tawar","Bagan Melibur","Kuala Selat","Kuala Selat Selatan","Tagaraja","Sungai Teritip"],
-  "Kempas":["Kempas Jaya","Rumbai Jaya","Seberang Kempas","Pauh","Pelanduk","Pangkalan Jambu"],
-  "Kemuning":["Kemuning Muda","Sekara","Talang Jangkang","Beringin Jaya"],
-  "Keritang":["Batang Tumu","Pengalihan","Kuala Keritang","Pasar Kembang","Sungai Buluh"],
-  "Kuala Indragiri":["Kuala Lahang","Rambaian","Sungai Intan","Pasir Putih"],
-  "Mandah":["Batang Tumu","Pelangiran","Suak Madura","Bekawan","Bente"],
-  "Pelangiran":["Sungai Beringin","Tagagiri Tama Jaya","Pelangiran","Sungai Simbar","Lahang"],
-  "Pulau Burung":["Pulau Burung","Sumber Jaya","Simpang Kiri","Pusaran"],
-  "Reteh":["Sungai Undan","Pulau Kijang","Sungai Ara","Teluk Kiambang"],
-  "Sungai Batang":["Sungai Batang","Sungai Junjangan","Sungai Dusun","Teluk Medan"],
-  "Tanah Merah":["Tanah Merah","Tanjung Baru","Tanjung Pasir","Tanah Merah Hulu"],
-  "Teluk Belengkong":["Teluk Belengkong","Teluk Kiambang","Teluk Medan"],
-  "Tembilahan":["Pekan Arba","Seberang Tembilahan","Seberang Tembilahan Barat","Seberang Tembilahan Selatan","Sungai Beringin","Sungai Perak","Tembilahan Hilir","Tembilahan Kota"],
-  "Tembilahan Hulu":["Tembilahan Hulu","Sungai Intan","Pekan Kamis","Pekan Arba"],
-  "Tempuling":["Tempuling","Mumpa","Teluk Jira","Pelanduk","Pangkalan Jambu"]
-};
+const dataKec={"Batang Tuaka":["Sungai Piring","Gemilang Jaya","Kuala Sebatu","Pasir Emas","Sialang Jaya","Simpang Jaya","Sungai Dusun","Sungai Junjangan","Sungai Luar","Sungai Rawa","Sungai Raya","Tanjung Siantar","Tasik Raya"],"Concong":["Concong Dalam","Concong Luar","Concong Tengah","Kampung Baru","Panglima Raja","Sungai Berapit"],"Enok":["Bagan Jaya","Enok","Jaya Bhakti","Pengalihan","Pusaran","Rantau Panjang","Simpang Tiga","Suhada","Sungai Ambat","Sungai Lokan","Sungai Rukam","Teluk Medan"],"Gaung":["Belantaraya","Gembira","Jerambang","Kuala Lahang","Lahang Baru","Lahang Hulu","Lahang Tengah","Pungkat","Simpang Gaung","Sungai Baru","Teluk Kabung","Terusan Kempas"],"Tembilahan":["Pekan Arba","Seberang Tembilahan","Seberang Tembilahan Barat","Seberang Tembilahan Selatan","Sungai Beringin","Sungai Perak","Tembilahan Hilir","Tembilahan Kota"]};
 const kecSelect=document.getElementById("kecamatan");
-for(const k in dataKec){
-  const opt=document.createElement("option");
-  opt.value=k;opt.text=k;kecSelect.appendChild(opt);
-}
-function populateDesa(){
-  const desaSelect=document.getElementById("desa_kelurahan");
-  desaSelect.innerHTML="";
-  const kec=kecSelect.value;
-  if(dataKec[kec]){
-    dataKec[kec].forEach(d=>{
-      const opt=document.createElement("option");
-      opt.value=d;opt.text=d;desaSelect.appendChild(opt);
-    });
-  }
-}
-
-// fungsi hitung sederhana
-function hitungProduksi(){
-  const v=+document.getElementById("produksi_volume").value||0;
-  const h=+document.getElementById("produksi_harga").value||0;
-  document.getElementById("produksi_total").value=v*h;
-  updateRingkasan();
-}
-function hitungSewa(){
-  const v=+sewa_volume.value||0, h=+sewa_harga.value||0;
-  sewa_total.value=v*h; updateRingkasan();
-}
-function hitungPenyusutan(){
-  const total=(+traktor.value||0)+(+combine.value||0)+(+thresher.value||0)+(+pompa.value||0)+(+alat_tangan.value||0);
-  penyusutan_total.value=total; updateRingkasan();
-}
-function hitungBenih(){benih_total.value=(+benih_vol.value||0)*(+benih_harga.value||0);updateRingkasan();}
-function hitungPupuk(){
-  pupuk_total.value=(+urea.value||0)+(+npk.value||0)+(+organik.value||0);
-  updateRingkasan();
-}
-function hitungPestisida(){
-  pestisida_total.value=(+herbisida.value||0)+(+insektisida.value||0)+(+fungisida.value||0);
-  updateRingkasan();
-}
-function hitungUpah(){
-  upah_total.value=(+upah_pengolahan.value||0)+(+upah_tanam.value||0)+(+upah_panen.value||0);
-  updateRingkasan();
-}
-function hitungSewaAlat(){
-  sewaalat_total.value=(+sewa_traktor.value||0)+(+sewa_pompa.value||0);
-  updateRingkasan();
-}
-function hitungBahanBakar(){
-  bahanbakar_total.value=(+bahanbakar.value||0);
-  updateRingkasan();
-}
+for(const k in dataKec){const opt=document.createElement("option");opt.value=k;opt.text=k;kecSelect.appendChild(opt);}
+function populateDesa(){const dSel=document.getElementById("desa_kelurahan");dSel.innerHTML="";const k=kecSelect.value;if(dataKec[k])dataKec[k].forEach(d=>{const o=document.createElement("option");o.value=d;o.text=d;dSel.appendChild(o);});}
 
 function updateRingkasan(){
   const produksi=+produksi_total.value||0;
@@ -423,26 +241,18 @@ function updateRingkasan(){
   rc_ratio.value=total>0?(produksi/total).toFixed(2):"";
   hpp.value=produksi>0?(total/produksi).toFixed(2):"";
 }
+function hitungProduksi(){produksi_total.value=(+produksi_volume.value||0)*(+produksi_harga.value||0);updateRingkasan();}
 
-// kirim data ke spreadsheet
-document.getElementById("mainForm").addEventListener("submit", e=>{
+document.getElementById("mainForm").addEventListener("submit",e=>{
   e.preventDefault();
-  const data={};
-  document.querySelectorAll("input,select").forEach(el=>data[el.id]=el.value);
-  fetch(scriptURL,{
-    method:"POST",
-    body:JSON.stringify(data),
-    headers:{"Content-Type":"application/json"}
-  }).then(r=>r.text()).then(()=>{
+  const data={};document.querySelectorAll("input,select").forEach(el=>data[el.id]=el.value);
+  fetch(scriptURL,{method:"POST",body:JSON.stringify(data),headers:{"Content-Type":"application/json"}})
+  .then(r=>r.text()).then(()=>{
     alert("✅ Data berhasil dikirim!");
     document.getElementById("mainForm").reset();
     currentStep=1;showStep(currentStep);
-  }).catch(err=>{
-    alert("❌ Gagal kirim data: "+err);
-  });
+  }).catch(err=>{alert("❌ Gagal kirim data: "+err);});
 });
 </script>
 </body>
 </html>
-
-
