@@ -5,66 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir</title>
   <style>
-    * {margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
     body {
       background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-      no-repeat center center fixed;
+                  no-repeat center center fixed;
       background-size: cover;
-      display: flex; flex-direction: column; min-height: 100vh; color: #154734;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #154734;
     }
+
     header {
-      background: rgba(21, 71, 52, 0.95); color: white; padding: 18px 0;
-      text-align: center; font-weight: 700; backdrop-filter: blur(3px);
+      background: rgba(21, 71, 52, 0.95);
+      color: white;
+      padding: 18px 0;
+      text-align: center;
+      font-weight: 700;
+      backdrop-filter: blur(3px);
     }
-    header small {display: block; font-weight: normal; font-size: 0.9em; margin-top: 3px;}
+
+    header small {
+      display: block;
+      font-weight: normal;
+      font-size: 0.9em;
+      margin-top: 3px;
+    }
+
     main {
-      flex: 1; display: flex; justify-content: center; align-items: flex-start;
-      padding: 40px 20px; gap: 25px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
     }
-    .sidebar {
-      background: rgba(255,255,255,0.9); padding: 25px; border-radius: 12px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15); width: 250px; text-align: center;
-      backdrop-filter: blur(6px); height: fit-content;
+
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 35px 50px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+      backdrop-filter: blur(6px);
+      max-width: 420px;
+      width: 100%;
     }
+
+    h2 {
+      color: #154734;
+      font-size: 1.4em;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 0.95em;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
     .btn {
-      display: block; background: #196d3f; color: #fff; text-decoration: none;
-      padding: 12px 0; border-radius: 8px; font-weight: 600; margin: 10px 0;
+      display: block;
+      background: #196d3f;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 0;
+      border-radius: 8px;
+      font-weight: 600;
+      margin: 10px 0;
       transition: background 0.3s ease;
     }
-    .btn:hover {background: #1e8c51;}
-    .logout {background: #b02a37;} .logout:hover {background: #c93e4a;}
-    .content {
-      flex: 1; background: rgba(255,255,255,0.92); padding: 25px 40px; border-radius: 15px;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.15); backdrop-filter: blur(6px);
-      max-width: 750px; width: 100%; text-align: left;
+
+    .btn:hover {
+      background: #1e8c51;
     }
-    .content h2 {color: #154734; margin-bottom: 6px;}
-    .subtext {color: #38754d; font-size: 0.9em; margin-bottom: 20px; font-weight: 500;}
-    .data-box {
-      background: #f6faf8; border-left: 6px solid #196d3f; padding: 15px 20px;
-      margin-bottom: 15px; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+
+    .logout {
+      background: #b02a37;
     }
-    .data-box h3 {margin-bottom: 5px; color: #154734;}
-    .data-box span {font-size: 1.2em; font-weight: 600; color: #1b4332;}
-    .petani-box {
-      background: #f9fdfb; border: 1px solid #d1e7dd; border-left: 5px solid #196d3f;
-      padding: 12px 15px; border-radius: 6px; margin-bottom: 8px;
-      font-weight: 500; display: flex; justify-content: space-between;
+
+    .logout:hover {
+      background: #c93e4a;
     }
-    .kosong {color: #888; font-style: italic;}
-    .total-box {
-      background: #e6f4ee; border-top: 2px solid #196d3f;
-      margin-top: 10px; padding: 10px 15px; border-radius: 8px;
-      font-weight: 700; display: flex; justify-content: space-between; color: #0f5132;
-    }
+
     footer {
-      text-align: center; font-size: 0.85em; color: #fff;
-      padding: 12px; background: rgba(21, 71, 52, 0.85); backdrop-filter: blur(3px);
-    }
-    @media (max-width: 768px) {
-      main {flex-direction: column; align-items: center;}
-      .sidebar {width: 100%;}
-      .content {width: 100%;}
+      text-align: center;
+      font-size: 0.85em;
+      color: #fff;
+      padding: 12px;
+      background: rgba(21, 71, 52, 0.85);
+      backdrop-filter: blur(3px);
     }
   </style>
 </head>
@@ -75,25 +110,12 @@
   </header>
 
   <main>
-    <div class="sidebar">
+    <div class="card">
+      <h2>📊 Dashboard Utama</h2>
+      <p>Silakan pilih menu untuk melanjutkan.</p>
       <a href="form.html" class="btn">📝 Isi Form Laporan</a>
       <a href="tampil.html" class="btn">📊 Lihat Rekap Data</a>
       <a href="#" class="btn logout" onclick="logout()">🚪 Logout</a>
-    </div>
-
-    <div class="content">
-      <h2>📈 Laporan Interaktif</h2>
-      <div class="subtext">Update hari ini</div>
-
-      <div class="data-box">
-        <h3>🌾 Total Stok per Petani</h3>
-        <div id="stok-list">Sedang memuat...</div>
-      </div>
-
-      <div class="data-box">
-        <h3>🍚 Harga Rata-Rata Petani Hari Ini</h3>
-        <span id="harga-rata">Sedang memuat...</span>
-      </div>
     </div>
   </main>
 
@@ -101,105 +123,16 @@
     © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
 
-<script>
-if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
+  <script>
+    // Cegah akses tanpa login
+    if (!localStorage.getItem("loginUser")) {
+      window.location.href = "index.html";
+    }
 
-function logout() {
-  localStorage.removeItem("loginUser");
-  window.location.href = "index.html";
-}
-
-const url =
-  "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
-
-async function loadData() {
-  try {
-    const res = await fetch(url + "?t=" + Date.now());
-    const raw = await res.json();
-    const header = raw[0];
-    const body = raw.slice(1);
-
-    // Cari posisi kolom
-    const colTimestamp = header.findIndex((h) =>
-      h.toLowerCase().includes("timestamp")
-    );
-    const colNama = header.findIndex((h) =>
-      h.toLowerCase().includes("nama")
-    );
-    const colStok = header.findIndex((h) =>
-      h.toLowerCase().includes("stok gkp")
-    );
-    const colHarga = header.findIndex((h) =>
-      h.toLowerCase().includes("harga petani gkp")
-    );
-
-    const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
-    const dataPetani = {};
-    daftarPetani.forEach((n) => (dataPetani[n] = null));
-
-    // Ambil tanggal hari ini dalam format dd/mm/yyyy
-    const today = new Date();
-    const d = String(today.getDate()).padStart(2, "0");
-    const m = String(today.getMonth() + 1).padStart(2, "0");
-    const y = today.getFullYear();
-    const todayStr = `${d}/${m}/${y}`;
-
-    let totalHarga = 0,
-      hitungHarga = 0;
-
-    body.forEach((row) => {
-      const ts = (row[colTimestamp] || "").toString();
-      const nama = (row[colNama] || "").trim();
-      const stok = parseFloat(row[colStok]) || 0;
-      const harga = parseFloat(row[colHarga]) || 0;
-
-      // Cek kalau timestamp mengandung tanggal hari ini
-      if (ts.includes(todayStr) && daftarPetani.includes(nama)) {
-        dataPetani[nama] = stok;
-        if (harga > 0) {
-          totalHarga += harga;
-          hitungHarga++;
-        }
-      }
-    });
-
-    const container = document.getElementById("stok-list");
-    container.innerHTML = "";
-
-    daftarPetani.forEach((nama) => {
-      const div = document.createElement("div");
-      div.className = "petani-box";
-      if (dataPetani[nama] !== null) {
-        div.innerHTML = `<span>${nama}</span><span>${dataPetani[
-          nama
-        ].toLocaleString("id-ID")} kg ✅</span>`;
-      } else {
-        div.innerHTML = `<span>${nama}</span><span style="color:#999">Belum update hari ini ❌</span>`;
-      }
-      container.appendChild(div);
-    });
-
-    document.getElementById("harga-rata").textContent = hitungHarga
-      ? "Rp " +
-        Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") +
-        "/kg"
-      : "-";
-  } catch (err) {
-    document.getElementById("stok-list").textContent =
-      "⚠️ Gagal memuat data";
-    document.getElementById("harga-rata").textContent = "-";
-    console.error(err);
-  }
-}
-
-loadData();
-</script>
+    function logout() {
+      localStorage.removeItem("loginUser");
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
