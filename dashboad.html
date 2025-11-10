@@ -23,7 +23,7 @@
     }
     .sidebar {
       background: rgba(255,255,255,0.9); padding: 25px; border-radius: 12px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15); width: 200px; text-align: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15); width: 250px; text-align: center;
       backdrop-filter: blur(6px); height: fit-content;
     }
     .btn {
@@ -102,76 +102,92 @@
   </footer>
 
   <script>
-    if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
-    function logout() {
-      localStorage.removeItem("loginUser");
-      window.location.href = "index.html";
-    }
+  if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
+  function logout() {
+    localStorage.removeItem("loginUser");
+    window.location.href = "index.html";
+  }
 
-    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+  const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
 
-    async function loadData() {
-      try {
-        const res = await fetch(url + "?t=" + Date.now());
-        const raw = await res.json();
-        const header = raw[0];
-        const body = raw.slice(1);
+  async function loadData() {
+    try {
+      const res = await fetch(url + "?t=" + Date.now());
+      const raw = await res.json();
+      const header = raw[0];
+      const body = raw.slice(1);
 
-        const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
-        const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
-        const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
-        const colTimestamp = 0;
+      const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
+      const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
+      const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
+      const colTimestamp = 0; // biasanya kolom pertama = timestamp
 
-        const today = new Date();
-        const todayStr = today.toLocaleDateString("id-ID");
+      const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
+      const dataPetani = {};
+      let totalHarga = 0, hitungHarga = 0;
 
-        const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
-        const dataPetani = {};
-        let totalHarga = 0, hitungHarga = 0;
+      // isi awal semua petani = belum update
+      daftarPetani.forEach(nama => dataPetani[nama] = null);
 
-        // isi awal semua petani = belum update
-        daftarPetani.forEach(nama => dataPetani[nama] = null);
+      // tanggal hari ini (YYYY-MM-DD)
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
 
-        body.forEach(row => {
-          const nama = (row[colNama] || "").trim();
-          const stok = parseFloat(row[colStok]) || 0;
-          const harga = parseFloat(row[colHarga]) || 0;
-          const timestamp = row[colTimestamp]?.toString() || "";
+      body.forEach(row => {
+        const nama = (row[colNama] || "").trim();
+        const stok = parseFloat(row[colStok]) || 0;
+        const harga = parseFloat(row[colHarga]) || 0;
+        const timestampRaw = row[colTimestamp];
 
-          if (timestamp.includes(todayStr) && daftarPetani.includes(nama)) {
-            dataPetani[nama] = stok;
-            if (harga > 0) {
-              totalHarga += harga;
-              hitungHarga++;
-            }
+        if (!timestampRaw) return;
+
+        // ubah timestamp ke format universal
+        let ts = timestampRaw.toString();
+        if (ts.includes("/")) {
+          // Format dd/mm/yyyy -> ubah jadi yyyy-mm-dd
+          const parts = ts.split(" ")[0].split("/");
+          if (parts.length === 3) {
+            ts = `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
           }
-        });
+        } else if (ts.includes("T")) {
+          ts = ts.split("T")[0]; // format ISO
+        }
 
-        const container = document.getElementById("stok-list");
-        container.innerHTML = "";
-
-        daftarPetani.forEach(nama => {
-          const div = document.createElement("div");
-          div.className = "petani-box";
-          if (dataPetani[nama] !== null) {
-            div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg</span>`;
-          } else {
-            div.innerHTML = `<span>${nama}</span><span class="kosong">Belum update hari ini</span>`;
+        if (ts === todayStr && daftarPetani.includes(nama)) {
+          dataPetani[nama] = stok;
+          if (harga > 0) {
+            totalHarga += harga;
+            hitungHarga++;
           }
-          container.appendChild(div);
-        });
+        }
+      });
 
-        document.getElementById("harga-rata").textContent =
-          hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
+      const container = document.getElementById("stok-list");
+      container.innerHTML = "";
 
-      } catch (err) {
-        document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
-        document.getElementById("harga-rata").textContent = "-";
-        console.error(err);
-      }
+      daftarPetani.forEach(nama => {
+        const div = document.createElement("div");
+        div.className = "petani-box";
+        if (dataPetani[nama] !== null) {
+          div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg ✅</span>`;
+        } else {
+          div.innerHTML = `<span>${nama}</span><span class="kosong">Belum update hari ini ❌</span>`;
+        }
+        container.appendChild(div);
+      });
+
+      document.getElementById("harga-rata").textContent =
+        hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
+
+    } catch (err) {
+      document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
+      document.getElementById("harga-rata").textContent = "-";
+      console.error(err);
     }
+  }
 
-    loadData();
-  </script>
+  loadData();
+</script>
 </body>
 </html>
+
