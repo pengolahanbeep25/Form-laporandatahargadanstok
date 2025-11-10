@@ -101,7 +101,7 @@
     © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
 
-  <script>
+<script>
   if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
   function logout() {
     localStorage.removeItem("loginUser");
@@ -120,40 +120,52 @@
       const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
       const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
       const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
-      const colTimestamp = 0; // biasanya kolom pertama = timestamp
+      const colTimestamp = 0;
 
       const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
       const dataPetani = {};
       let totalHarga = 0, hitungHarga = 0;
-
-      // isi awal semua petani = belum update
       daftarPetani.forEach(nama => dataPetani[nama] = null);
 
-      // tanggal hari ini (YYYY-MM-DD)
       const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
+      const todayStr = today.toISOString().split("T")[0]; // yyyy-mm-dd
+
+      const bulanMap = {
+        januari: "01", februari: "02", maret: "03", april: "04",
+        mei: "05", juni: "06", juli: "07", agustus: "08",
+        september: "09", oktober: "10", november: "11", desember: "12"
+      };
 
       body.forEach(row => {
         const nama = (row[colNama] || "").trim();
         const stok = parseFloat(row[colStok]) || 0;
         const harga = parseFloat(row[colHarga]) || 0;
-        const timestampRaw = row[colTimestamp];
+        let ts = (row[colTimestamp] || "").toString().trim().toLowerCase();
 
-        if (!timestampRaw) return;
+        if (!ts) return;
 
-        // ubah timestamp ke format universal
-        let ts = timestampRaw.toString();
+        let dateNormalized = "";
+
+        // Format 10/11/2025
         if (ts.includes("/")) {
-          // Format dd/mm/yyyy -> ubah jadi yyyy-mm-dd
           const parts = ts.split(" ")[0].split("/");
           if (parts.length === 3) {
-            ts = `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+            const [dd, mm, yyyy] = parts;
+            dateNormalized = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
           }
-        } else if (ts.includes("T")) {
-          ts = ts.split("T")[0]; // format ISO
+        }
+        // Format 10 November 2025
+        else if (ts.match(/[a-z]/)) {
+          const parts = ts.split(" ");
+          if (parts.length >= 3) {
+            const d = parts[0].padStart(2, "0");
+            const m = bulanMap[parts[1]] || "01";
+            const y = parts[2];
+            dateNormalized = `${y}-${m}-${d}`;
+          }
         }
 
-        if (ts === todayStr && daftarPetani.includes(nama)) {
+        if (dateNormalized === todayStr && daftarPetani.includes(nama)) {
           dataPetani[nama] = stok;
           if (harga > 0) {
             totalHarga += harga;
@@ -190,4 +202,5 @@
 </script>
 </body>
 </html>
+
 
