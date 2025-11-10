@@ -103,12 +103,41 @@
 
   <script>
 if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
+
 function logout() {
   localStorage.removeItem("loginUser");
   window.location.href = "index.html";
 }
 
 const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+
+// --- Fungsi bantu ubah format timestamp jadi tanggal normal
+function parseTanggal(ts) {
+  if (!ts) return null;
+  ts = ts.toString().trim().toLowerCase();
+
+  // Kalau format 10/11/2025 11:34:43
+  if (ts.includes("/")) {
+    const parts = ts.split(/[ /:]+/);
+    const [d, m, y] = parts;
+    return `${parseInt(d)}-${parseInt(m)}-${y}`;
+  }
+
+  // Kalau format 24 September 2025
+  const bulanMap = {
+    januari: 1, februari: 2, maret: 3, april: 4, mei: 5, juni: 6,
+    juli: 7, agustus: 8, september: 9, oktober: 10, november: 11, desember: 12
+  };
+  const parts = ts.split(" ");
+  if (parts.length >= 3) {
+    const d = parseInt(parts[0]);
+    const b = bulanMap[parts[1]] || 0;
+    const y = parts[2];
+    if (b) return `${d}-${b}-${y}`;
+  }
+
+  return null;
+}
 
 async function loadData() {
   try {
@@ -117,39 +146,35 @@ async function loadData() {
     const header = raw[0];
     const body = raw.slice(1);
 
+    const colTimestamp = header.findIndex(h => h.toLowerCase().includes("timestamp"));
     const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
     const colStok = header.findIndex(h => h.toLowerCase().includes("stok gkp"));
     const colHarga = header.findIndex(h => h.toLowerCase().includes("harga petani gkp"));
-    const colTimestamp = 0;
 
     const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
     const dataPetani = {};
-    let totalHarga = 0, hitungHarga = 0;
     daftarPetani.forEach(nama => dataPetani[nama] = null);
 
-    // Dapatkan tanggal dan bulan sekarang (huruf kecil)
     const today = new Date();
-    const hari = today.getDate().toString();
-    const bulanList = [
-      "januari", "februari", "maret", "april", "mei", "juni",
-      "juli", "agustus", "september", "oktober", "november", "desember"
-    ];
-    const bulanNow = bulanList[today.getMonth()];
+    const hari = today.getDate();
+    const bulan = today.getMonth() + 1;
+    const tahun = today.getFullYear();
+
+    let totalHarga = 0, hitungHarga = 0;
 
     body.forEach(row => {
       const nama = (row[colNama] || "").trim();
       const stok = parseFloat(row[colStok]) || 0;
       const harga = parseFloat(row[colHarga]) || 0;
-      const ts = (row[colTimestamp] || "").toString().toLowerCase();
+      const ts = parseTanggal(row[colTimestamp]);
 
-      // deteksi tanggal hari ini (contoh "10 november 2025")
-      if (ts.includes(`${hari} ${bulanNow}`)) {
-        if (daftarPetani.includes(nama)) {
-          dataPetani[nama] = stok;
-          if (harga > 0) {
-            totalHarga += harga;
-            hitungHarga++;
-          }
+      if (!ts || !nama) return;
+      const [d, m, y] = ts.split("-").map(Number);
+      if (d === hari && m === bulan && y === tahun && daftarPetani.includes(nama)) {
+        dataPetani[nama] = stok;
+        if (harga > 0) {
+          totalHarga += harga;
+          hitungHarga++;
         }
       }
     });
@@ -163,7 +188,7 @@ async function loadData() {
       if (dataPetani[nama] !== null) {
         div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg ✅</span>`;
       } else {
-        div.innerHTML = `<span>${nama}</span><span class="kosong">Belum update hari ini ❌</span>`;
+        div.innerHTML = `<span>${nama}</span><span style="color:#999">Belum update hari ini ❌</span>`;
       }
       container.appendChild(div);
     });
@@ -182,6 +207,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
