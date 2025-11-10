@@ -70,17 +70,10 @@
       transition: background 0.3s ease;
     }
 
-    .btn:hover {
-      background: #1e8c51;
-    }
+    .btn:hover { background: #1e8c51; }
 
-    .logout {
-      background: #b02a37;
-    }
-
-    .logout:hover {
-      background: #c93e4a;
-    }
+    .logout { background: #b02a37; }
+    .logout:hover { background: #c93e4a; }
 
     .content {
       flex: 1;
@@ -89,7 +82,7 @@
       border-radius: 15px;
       box-shadow: 0 8px 18px rgba(0,0,0,0.15);
       backdrop-filter: blur(6px);
-      max-width: 700px;
+      max-width: 750px;
       width: 100%;
       text-align: left;
     }
@@ -108,15 +101,31 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     }
 
-    .data-box h3 {
-      margin-bottom: 5px;
-      color: #154734;
+    .data-box h3 { margin-bottom: 5px; color: #154734; }
+    .data-box span { font-size: 1.2em; font-weight: 600; color: #1b4332; }
+
+    .petani-box {
+      background: #f9fdfb;
+      border: 1px solid #d1e7dd;
+      border-left: 5px solid #196d3f;
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
     }
 
-    .data-box span {
-      font-size: 1.2em;
-      font-weight: 600;
-      color: #1b4332;
+    .total-box {
+      background: #e6f4ee;
+      border-top: 2px solid #196d3f;
+      margin-top: 10px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      color: #0f5132;
     }
 
     footer {
@@ -149,16 +158,16 @@
     </div>
 
     <div class="content">
-      <h2>📈 Laporan Interaktif Hari Ini</h2>
+      <h2>📊 Laporan Stok Gabah Petani</h2>
 
       <div class="data-box">
-        <h3>🌾 Total Stok Gabah Petani</h3>
-        <span id="stok">Sedang memuat...</span>
+        <h3>🌾 Total Stok per Petani</h3>
+        <div id="stok-list">Sedang memuat...</div>
       </div>
 
       <div class="data-box">
-        <h3>🍚 Harga Beras Medium</h3>
-        <span id="beras">Sedang memuat...</span>
+        <h3>🍚 Harga Rata-Rata Petani (GKP)</h3>
+        <span id="harga-rata">Sedang memuat...</span>
       </div>
 
       <div class="data-box">
@@ -169,64 +178,80 @@
   </main>
 
   <footer>
-    © 2025 Dinas Pangan Tanaman pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
+    © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
 
   <script>
-    // Cegah akses tanpa login
-    if (!localStorage.getItem("loginUser")) {
-      window.location.href = "index.html";
-    }
+    if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
 
     function logout() {
       localStorage.removeItem("loginUser");
       window.location.href = "index.html";
     }
 
-    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec"; // ganti dengan link kamu
+    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
 
     async function loadData() {
       try {
-        const res = await fetch(url);
+        const res = await fetch(url + "?t=" + Date.now());
         const raw = await res.json();
-
         const header = raw[0];
         const body = raw.slice(1);
 
-        // Cari posisi kolom sesuai nama
-        const colStok = header.indexOf("stok_gkp");
-        const colHarga = header.indexOf("harga_petani_gkp");
+        const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
+        const colStok = header.findIndex(h => h.toLowerCase().includes("stok"));
+        const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani"));
 
-        let totalStok = 0;
-        let totalHarga = 0;
-        let hitungHarga = 0;
+        if (colNama === -1 || colStok === -1) {
+          document.getElementById("stok-list").textContent = "❌ Kolom 'Nama' atau 'Stok' tidak ditemukan di Sheet.";
+          return;
+        }
+
+        const dataPetani = {};
+        let totalHarga = 0, hitungHarga = 0;
 
         body.forEach(row => {
+          const nama = (row[colNama] || "Tidak diketahui").trim();
           const stok = parseFloat(row[colStok]) || 0;
           const harga = parseFloat(row[colHarga]) || 0;
-          totalStok += stok;
+
+          if (!dataPetani[nama]) dataPetani[nama] = 0;
+          dataPetani[nama] += stok;
+
           if (harga > 0) {
             totalHarga += harga;
             hitungHarga++;
           }
         });
 
-        document.getElementById("stok").textContent =
-          totalStok.toLocaleString("id-ID") + " kg";
-        document.getElementById("beras").textContent =
-          "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg";
+        const container = document.getElementById("stok-list");
+        container.innerHTML = "";
+
+        const sorted = Object.entries(dataPetani).sort((a,b) => b[1]-a[1]);
+        let totalSemua = 0;
+
+        sorted.forEach(([nama, stok]) => {
+          const div = document.createElement("div");
+          div.className = "petani-box";
+          div.innerHTML = `<span>${nama}</span><span>${stok.toLocaleString("id-ID")} kg</span>`;
+          container.appendChild(div);
+          totalSemua += stok;
+        });
+
+        // Tambahkan total keseluruhan
+        const totalDiv = document.createElement("div");
+        totalDiv.className = "total-box";
+        totalDiv.innerHTML = `<span>Total Keseluruhan</span><span>${totalSemua.toLocaleString("id-ID")} kg</span>`;
+        container.appendChild(totalDiv);
+
+        document.getElementById("harga-rata").textContent =
+          hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
         document.getElementById("tanggal").textContent =
-          new Date().toLocaleDateString("id-ID", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
+          new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
       } catch (err) {
-        document.getElementById("stok").textContent = "⚠️ Gagal memuat data";
-        document.getElementById("beras").textContent = "-";
-        document.getElementById("tanggal").textContent = "-";
+        document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
+        document.getElementById("harga-rata").textContent = "-";
         console.error(err);
       }
     }
