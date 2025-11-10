@@ -89,7 +89,14 @@
 
     .content h2 {
       color: #154734;
+      margin-bottom: 6px;
+    }
+
+    .subtext {
+      color: #38754d;
+      font-size: 0.9em;
       margin-bottom: 20px;
+      font-weight: 500;
     }
 
     .data-box {
@@ -158,21 +165,17 @@
     </div>
 
     <div class="content">
-      <h2>📊 Laporan Stok Gabah Petani</h2>
+      <h2>📈 Laporan Interaktif</h2>
+      <div class="subtext">Update hari ini</div>
 
       <div class="data-box">
-        <h3>🌾 Total Stok per Petani</h3>
+        <h3>🌾 Total Stok per Petani (Hari Ini)</h3>
         <div id="stok-list">Sedang memuat...</div>
       </div>
 
       <div class="data-box">
-        <h3>🍚 Harga Rata-Rata Petani (GKP)</h3>
+        <h3>🍚 Harga Rata-Rata Petani (Hari Ini)</h3>
         <span id="harga-rata">Sedang memuat...</span>
-      </div>
-
-      <div class="data-box">
-        <h3>📅 Tanggal Update</h3>
-        <span id="tanggal"></span>
       </div>
     </div>
   </main>
@@ -199,13 +202,11 @@
         const body = raw.slice(1);
 
         const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
-        const colStok = header.findIndex(h => h.toLowerCase().includes("stok"));
-        const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani"));
+        const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
+        const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
+        const colTanggal = header.findIndex(h => h.toLowerCase().includes("date"));
 
-        if (colNama === -1 || colStok === -1) {
-          document.getElementById("stok-list").textContent = "❌ Kolom 'Nama' atau 'Stok' tidak ditemukan di Sheet.";
-          return;
-        }
+        const today = new Date().toLocaleDateString("id-ID");
 
         const dataPetani = {};
         let totalHarga = 0, hitungHarga = 0;
@@ -214,13 +215,17 @@
           const nama = (row[colNama] || "Tidak diketahui").trim();
           const stok = parseFloat(row[colStok]) || 0;
           const harga = parseFloat(row[colHarga]) || 0;
+          const tanggal = new Date(row[colTanggal]).toLocaleDateString("id-ID");
 
-          if (!dataPetani[nama]) dataPetani[nama] = 0;
-          dataPetani[nama] += stok;
+          // Hanya ambil yang tanggal hari ini
+          if (tanggal === today) {
+            if (!dataPetani[nama]) dataPetani[nama] = 0;
+            dataPetani[nama] += stok;
 
-          if (harga > 0) {
-            totalHarga += harga;
-            hitungHarga++;
+            if (harga > 0) {
+              totalHarga += harga;
+              hitungHarga++;
+            }
           }
         });
 
@@ -230,24 +235,25 @@
         const sorted = Object.entries(dataPetani).sort((a,b) => b[1]-a[1]);
         let totalSemua = 0;
 
-        sorted.forEach(([nama, stok]) => {
-          const div = document.createElement("div");
-          div.className = "petani-box";
-          div.innerHTML = `<span>${nama}</span><span>${stok.toLocaleString("id-ID")} kg</span>`;
-          container.appendChild(div);
-          totalSemua += stok;
-        });
+        if (sorted.length === 0) {
+          container.innerHTML = "<i>Belum ada input hari ini.</i>";
+        } else {
+          sorted.forEach(([nama, stok]) => {
+            const div = document.createElement("div");
+            div.className = "petani-box";
+            div.innerHTML = `<span>${nama}</span><span>${stok.toLocaleString("id-ID")} kg</span>`;
+            container.appendChild(div);
+            totalSemua += stok;
+          });
 
-        // Tambahkan total keseluruhan
-        const totalDiv = document.createElement("div");
-        totalDiv.className = "total-box";
-        totalDiv.innerHTML = `<span>Total Keseluruhan</span><span>${totalSemua.toLocaleString("id-ID")} kg</span>`;
-        container.appendChild(totalDiv);
+          const totalDiv = document.createElement("div");
+          totalDiv.className = "total-box";
+          totalDiv.innerHTML = `<span>Total Hari Ini</span><span>${totalSemua.toLocaleString("id-ID")} kg</span>`;
+          container.appendChild(totalDiv);
+        }
 
         document.getElementById("harga-rata").textContent =
           hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
-        document.getElementById("tanggal").textContent =
-          new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
       } catch (err) {
         document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
