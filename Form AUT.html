@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Form Analisis Usaha Tani</title>
+<title>Form Analisis Usaha Tani - Dinas PTPHP Inhil</title>
 <style>
   body {
     font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #b8f1b0, #64c37d);
+    background: linear-gradient(135deg, #b6e7c9, #88d498);
     margin: 0;
     padding: 0;
   }
@@ -15,14 +15,14 @@
     max-width: 850px;
     margin: 40px auto;
     background: #ffffff;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
   h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: #0f6b32;
+    color: #146c43;
   }
   .step {
     display: none;
@@ -114,13 +114,8 @@
     background-color: #f2f2f2;
   }
   @media (max-width: 600px) {
-    .container {
-      padding: 15px;
-    }
-    .button-group button {
-      width: 48%;
-      margin: 3px 1%;
-    }
+    .container { padding: 15px; }
+    .button-group button { width: 48%; margin: 3px 1%; }
   }
 </style>
 </head>
@@ -137,121 +132,160 @@
 
   <form id="mainForm">
 
-    <!-- STEP 1: DATA DASAR -->
-    <div class="step active" id="step1">
-      <h2>DATA DASAR</h2>
-      <label>Nama PIC *</label>
-      <input type="text" id="nama_pic" required>
-      <label>No. HP PIC *</label>
-      <input type="tel" id="hp_pic" placeholder="08XXXXXXXXXX" required>
-      <label>Jenis Kelompok *</label>
-      <select id="jenis_kelompok" required>
-        <option value="">Pilih</option>
-        <option value="Poktan">Poktan</option>
-        <option value="Gapoktan">Gapoktan</option>
-        <option value="KWT">KWT</option>
-      </select>
-      <label>Nama Kelompok *</label>
-      <input type="text" id="nama_kelompok" required>
-      <label>Provinsi *</label>
-      <select id="provinsi" required><option value="Riau" selected>Riau</option></select>
-      <label>Kota/Kabupaten *</label>
-      <select id="kabupaten" required><option value="Indragiri Hilir" selected>Indragiri Hilir</option></select>
-      <label>Kecamatan *</label>
-      <select id="kecamatan" required onchange="populateDesa()"></select>
-      <label>Desa/Kelurahan *</label>
-      <select id="desa_kelurahan" required></select>
-      <label>Alamat *</label>
-      <input type="text" id="alamat" required>
-      <label>Jenis Lahan *</label>
-      <select id="jenis_lahan" required>
-        <option value="">Pilih</option>
-        <option value="Sawah">Sawah</option>
-        <option value="Tadah Hujan">Tadah Hujan</option>
-        <option value="Lahan Kering">Lahan Kering</option>
-      </select>
-      <label>Luas Lahan (Ha)</label>
-      <input type="number" step="0.01" id="luas_lahan">
-      <label>Varietas *</label>
-      <input type="text" id="varietas" required>
-      <label>Periode Tanam *</label>
-      <input type="text" id="periode_tanam" required>
-      <label>Umur Panen (Hari)</label>
-      <input type="number" id="umur_panen">
-      <div class="button-group">
-        <button type="button" onclick="nextStep()">Lanjut</button>
-      </div>
-    </div>
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <h2>Data Dasar</h2>
+  <label>Nama PIC</label><input type="text" id="nama_pic" required>
+  <label>No HP PIC</label><input type="tel" id="hp_pic" required>
+  <label>Jenis Kelompok</label>
+  <select id="jenis_kelompok" required>
+    <option value="">Pilih</option>
+    <option value="Poktan">Poktan</option>
+    <option value="Gapoktan">Gapoktan</option>
+    <option value="KWT">KWT</option>
+  </select>
+  <label>Nama Kelompok</label><input type="text" id="nama_kelompok" required>
+  <label>Provinsi</label>
+  <select id="provinsi"><option selected>Riau</option></select>
+  <label>Kabupaten/Kota</label>
+  <select id="kabupaten"><option selected>Tembilahan</option></select>
+  <label>Kecamatan</label>
+  <select id="kecamatan" required onchange="populateDesa()"></select>
+  <label>Desa/Kelurahan</label>
+  <select id="desa_kelurahan" required></select>
+  <label>Alamat</label><input type="text" id="alamat" required>
+  <div class="button-group"><button type="button" onclick="nextStep()">Lanjut</button></div>
+</div>
 
-    <!-- STEP 2–5 -->
-    <div class="step" id="step2"><h2>Produksi</h2>
-      <label>Produksi (Kg)</label><input type="number" id="produksi_volume" oninput="hitungProduksi()">
-      <label>Harga (Rp)</label><input type="number" id="produksi_harga" oninput="hitungProduksi()">
-      <label>Total (Rp)</label><input type="number" id="produksi_total" class="auto" readonly>
-      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <h2>Produksi</h2>
+  <label>Volume Produksi (Kg)</label><input type="number" id="produksi_volume" oninput="updateRingkasan()">
+  <label>Harga (Rp/Kg)</label><input type="number" id="produksi_harga" oninput="updateRingkasan()">
+  <div class="button-group">
+    <button type="button" onclick="prevStep()">Kembali</button>
+    <button type="button" onclick="nextStep()">Lanjut</button>
+  </div>
+</div>
 
-    <div class="step" id="step3"><h2>Biaya Tetap</h2>
-      <label>Sewa Lahan (Rp)</label><input type="number" id="sewa_total" oninput="updateRingkasan()">
-      <label>Penyusutan Alsintan (Rp)</label><input type="number" id="penyusutan_total" oninput="updateRingkasan()">
-      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <h2>Biaya Tetap</h2>
+  <label>Sewa Lahan (Rp)</label><input type="number" id="sewa_lahan" oninput="updateRingkasan()">
+  <label>Penyusutan Alat (Rp)</label><input type="number" id="penyusutan" oninput="updateRingkasan()">
+  <div class="button-group">
+    <button type="button" onclick="prevStep()">Kembali</button>
+    <button type="button" onclick="nextStep()">Lanjut</button>
+  </div>
+</div>
 
-    <div class="step" id="step4"><h2>Biaya Variabel</h2>
-      <label>Benih (Rp)</label><input type="number" id="benih_total" oninput="updateRingkasan()">
-      <label>Pupuk (Rp)</label><input type="number" id="pupuk_total" oninput="updateRingkasan()">
-      <label>Pestisida (Rp)</label><input type="number" id="pestisida_total" oninput="updateRingkasan()">
-      <label>Tenaga Kerja (Rp)</label><input type="number" id="upah_total" oninput="updateRingkasan()">
-      <label>Sewa Alat (Rp)</label><input type="number" id="sewaalat_total" oninput="updateRingkasan()">
-      <label>Bahan Bakar (Rp)</label><input type="number" id="bahanbakar_total" oninput="updateRingkasan()">
-      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="button" onclick="nextStep()">Lanjut</button></div></div>
+<!-- STEP 4 -->
+<div class="step" id="step4">
+  <h2>Biaya Variabel</h2>
+  <label>Benih (Rp)</label><input type="number" id="benih" oninput="updateRingkasan()">
+  <label>Pupuk (Rp)</label><input type="number" id="pupuk" oninput="updateRingkasan()">
+  <label>Pestisida (Rp)</label><input type="number" id="pestisida" oninput="updateRingkasan()">
+  <label>Tenaga Kerja (Rp)</label><input type="number" id="tenaga_kerja" oninput="updateRingkasan()">
+  <label>Bahan Bakar (Rp)</label><input type="number" id="bahan_bakar" oninput="updateRingkasan()">
+  <div class="button-group">
+    <button type="button" onclick="prevStep()">Kembali</button>
+    <button type="button" onclick="nextStep()">Lanjut</button>
+  </div>
+</div>
 
-    <div class="step" id="step5"><h2>Ringkasan Usaha Tani</h2>
-      <label>Biaya Tetap (Rp)</label><input type="number" id="biaya_tetap_total" class="auto" readonly>
-      <label>Biaya Variabel (Rp)</label><input type="number" id="biaya_variabel_total" class="auto" readonly>
-      <label>Total Biaya Produksi (Rp)</label><input type="number" id="biaya_produksi_total" class="auto" readonly>
-      <label>Keuntungan (Rp)</label><input type="number" id="keuntungan_usaha" class="auto" readonly>
-      <label>R/C Ratio</label><input type="number" id="rc_ratio" class="auto" readonly>
-      <label>HPP (Rp)</label><input type="number" id="hpp" class="auto" readonly>
-      <div class="button-group"><button type="button" onclick="prevStep()">Kembali</button><button type="submit">Kirim</button></div></div>
+<!-- STEP 5 -->
+<div class="step" id="step5">
+  <h2>Ringkasan</h2>
+  <label>Total Biaya Tetap (Rp)</label><input type="number" id="biaya_tetap" readonly>
+  <label>Total Biaya Variabel (Rp)</label><input type="number" id="biaya_variabel" readonly>
+  <label>Total Biaya Produksi (Rp)</label><input type="number" id="total_biaya" readonly>
+  <label>Keuntungan (Rp)</label><input type="number" id="keuntungan" readonly>
+  <label>R/C Ratio</label><input type="number" id="rc_ratio" readonly>
+  <div class="button-group">
+    <button type="button" onclick="prevStep()">Kembali</button>
+    <button type="submit">Kirim</button>
+  </div>
+</div>
 
-  </form>
+</form>
 </div>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyo4vX_a18Q97l1mX2ZhiNkyUegy_eLZIZFvP5goXw-Z_dMhArmb04CXqa1tvOywEPH/exec";
-let currentStep = 1;
-function showStep(n){document.querySelectorAll(".step").forEach((s,i)=>s.classList.toggle("active",i===n-1));
-document.querySelectorAll(".progressbar li").forEach((el,idx)=>el.classList.toggle("active",idx<n));}
+
+// ==== STEP NAV ====
+let currentStep=1;
+function showStep(n){
+  document.querySelectorAll(".step").forEach((s,i)=>s.classList.toggle("active",i===n-1));
+  document.querySelectorAll(".progressbar li").forEach((el,idx)=>el.classList.toggle("active",idx<n));
+}
 function nextStep(){if(currentStep<5){currentStep++;showStep(currentStep);}}
 function prevStep(){if(currentStep>1){currentStep--;showStep(currentStep);}}
 
-const dataKec={"Batang Tuaka":["Sungai Piring","Gemilang Jaya","Kuala Sebatu","Pasir Emas","Sialang Jaya","Simpang Jaya","Sungai Dusun","Sungai Junjangan","Sungai Luar","Sungai Rawa","Sungai Raya","Tanjung Siantar","Tasik Raya"],"Concong":["Concong Dalam","Concong Luar","Concong Tengah","Kampung Baru","Panglima Raja","Sungai Berapit"],"Enok":["Bagan Jaya","Enok","Jaya Bhakti","Pengalihan","Pusaran","Rantau Panjang","Simpang Tiga","Suhada","Sungai Ambat","Sungai Lokan","Sungai Rukam","Teluk Medan"],"Gaung":["Belantaraya","Gembira","Jerambang","Kuala Lahang","Lahang Baru","Lahang Hulu","Lahang Tengah","Pungkat","Simpang Gaung","Sungai Baru","Teluk Kabung","Terusan Kempas"],"Tembilahan":["Pekan Arba","Seberang Tembilahan","Seberang Tembilahan Barat","Seberang Tembilahan Selatan","Sungai Beringin","Sungai Perak","Tembilahan Hilir","Tembilahan Kota"]};
+// ==== DATA KECAMATAN ====
+const dataWilayah = {
+  "Batang Tuaka": {kelurahan:["Sungai Piring"],desa:["Gemilang Jaya","Kuala Sebatu","Pasir Emas","Sialang Jaya","Simpang Jaya","Sungai Dusun","Sungai Junjangan","Sungai Luar","Sungai Rawa","Sungai Raya","Tanjung Siantar","Tasik Raya"]},
+  "Concong": {kelurahan:["Concong Luar"],desa:["Concong Dalam","Concong Tengah","Kampung Baru","Panglima Raja","Sungai Berapit"]},
+  "Enok": {kelurahan:["Enok","Pusaran","Pantai Seberang Makmur","Simpang Tiga"],desa:["Bagan Jaya","Jaya Bhakti","Pengalihan","Rantau Panjang","Simpang Tiga Daratan","Suhada","Sungai Ambat","Sungai Lokan","Sungai Rukam","Teluk Medan"]},
+  "Gaung": {kelurahan:["Kuala Lahang"],desa:["Belantaraya","Gembira","Jerambang","Lahang Baru","Lahang Hulu","Lahang Tengah","Pintasan","Pungkat","Semambu Kuning","Simpang Gaung","Soren","Sungai Baru","Teluk Kabung","Teluk Merbau","Teluk Nibung","Terusan Kempas"]},
+  "Gaung Anak Serka": {kelurahan:["Teluk Pinang","Tanjung Harapan","Sungai Empat"],desa:["Harapan Makmur","Idaman","Kelumpang","Kuala Gaung","Rambaian","Sungai Iliran","Teluk Pantaian","Teluk Sungka","Teluk Tuasan"]},
+  "Kateman": {kelurahan:["Tagaraja","Bandar Sri Gemilang","Amal Bhakti"],desa:["Air Tawar","Kuala Selat","Penjuru","Sari Mulya","Sungai Simbar","Sungai Teritip","Tanjung Raja","Makmur Jaya"]},
+  "Kempas": {kelurahan:["Kempas Jaya","Harapan Tani"],desa:["Bayas Jaya","Danau Pulai Indah","Karya Tani","Kerta Jaya","Kulim Jaya","Pekan Tua","Rumbai Jaya","Sungai Ara","Sungai Gantang","Sungai Rabit"]},
+  "Kemuning": {kelurahan:["Selensen"],desa:["Air Balui","Batu Ampar","Tuk Jimun","Kemuning Muda","Kemuning Tua","Keritang","Limau Manis","Lubuk Besar","Sekara","Sekayan","Talang Jangkang"]},
+  "Keritang": {kelurahan:["Kota Baru Reteh"],desa:["Kayu Raja","Kembang Mekar Sari","Kota Baru Seberida","Kuala Keritang","Kuala Lemang","Lintas Utara","Nusantara Jaya","Nyiur Permai","Pancur","Pasar Kembang","Pebenaan","Pengalihan","Petalongan","Seberang Pebenaan","Sencalang","Teluk Kelasa"]},
+  "Kuala Indragiri": {kelurahan:["Sapat"],desa:["Perigi Raja","Sungai Bela","Sungai Buluh","Sungai Piyai","Tanjung Lajau","Tanjung Melayu","Teluk Dalam"]},
+  "Mandah": {kelurahan:["Khairiah Mandah"],desa:["Bakau Aceh","Bantaian","Batang Sari","Batang Tumu","Bekawan","Belaras","Belaras Barat","Bente","Bidari Tanjung Datuk","Bolak Raya","Cahaya Baru","Igal","Pelanduk","Pulau Cawan","Sepakat Jaya","Surayya Mandiri"]},
+  "Pelangiran": {kelurahan:["Pelangiran"],desa:["Bagan Jaya","Baung Rejo Jaya","Catur Karya","Hidayah","Intan Mulya Jaya","Pinang Jaya","Rotan Semelur","Saka Palas Jaya","Simpang Kateman","Tagagiri Raja","Tagagiri Tama Jaya","Tanjung Simpang","Tegal Rejo Jaya","Teluk Bunian","Terusan Beringin Jaya","Wonosari"]},
+  "Pulau Burung": {kelurahan:[],desa:["Bangun Harjo Jaya","Beringin Jaya","Binangun Jaya","Bukit Sari Intan Jaya","Keramat Jaya","Manunggal Jaya","Mayang Sari Jaya","Pulau Burung","Ringin Jaya","Sapta Jaya","Sempadan Jaya","Sri Danai","Suka Jaya","Suko Harjo Jaya","Sungai Danai","Teluk Nibung"]},
+  "Reteh": {kelurahan:["Pulau Kijang","Madani","Metro"],desa:["Seberang Pulau Kijang","Pulau Kecil","Pulau Ruku","Sanglar","Seberang Sanglar","Sungai Asam","Sungai Mahang","Sungai Terab","Sungai Undan","Tanjung Labuh"]},
+  "Sungai Batang": {kelurahan:["Benteng"],desa:["Benteng Barat","Benteng Utara","Kuala Patah Parang","Kuala Sungai Batang","Mugo Mulyo","Pandan Sari","Pasenggarahan"]},
+  "Tanah Merah": {kelurahan:["Kuala Enok"],desa:["Selat Nama","Sungai Laut","Sungai Nyiur","Tanah Merah","Tanjung Baru","Tanjung Pasir","Tekulai Bugis","Tekulai Hilir","Tekulai Hulu"]},
+  "Teluk Belengkong": {kelurahan:[],desa:["Beringin Mulya","Gembaran","Griya Mukti Jaya","Hibrida Jaya","Hibrida Mulya","Indra Sari Jaya","Kelapa Patih Jaya","Saka Rotan","Sapta Mulya Jaya","Sumber Jaya","Sumber Makmur Jaya","Sumber Sari Jaya","Tunggal Rahayu Jaya"]},
+  "Tembilahan": {kelurahan:["Tembilahan Hilir","Pekan Arba","Seberang Tembilahan","Seberang Tembilahan Barat","Seberang Tembilahan Selatan"],desa:["Sungai Beringin","Sungai Perak","Tembilahan Kota"]},
+  "Tembilahan Hulu": {kelurahan:["Pekan Kamis","Pulau Palas","Sialang Panjang","Tembilahan Hulu"],desa:["Sungai Intan","Tembilahan Barat"]},
+  "Tempuling": {kelurahan:["Harapan Jaya","Karya Tunas Jaya","Mumpa"],desa:["Pangkalan Tujuh","Sungai Salak","Teluk Jira","Tempuling Jaya"]}
+};
 const kecSelect=document.getElementById("kecamatan");
-for(const k in dataKec){const opt=document.createElement("option");opt.value=k;opt.text=k;kecSelect.appendChild(opt);}
-function populateDesa(){const dSel=document.getElementById("desa_kelurahan");dSel.innerHTML="";const k=kecSelect.value;if(dataKec[k])dataKec[k].forEach(d=>{const o=document.createElement("option");o.value=d;o.text=d;dSel.appendChild(o);});}
-
-function updateRingkasan(){
-  const produksi=+produksi_total.value||0;
-  const biaya_tetap=(+sewa_total.value||0)+(+penyusutan_total.value||0);
-  const biaya_variabel=(+benih_total.value||0)+(+pupuk_total.value||0)+(+pestisida_total.value||0)+(+upah_total.value||0)+(+sewaalat_total.value||0)+(+bahanbakar_total.value||0);
-  const total=biaya_tetap+biaya_variabel;
-  biaya_tetap_total.value=biaya_tetap;
-  biaya_variabel_total.value=biaya_variabel;
-  biaya_produksi_total.value=total;
-  keuntungan_usaha.value=produksi-total;
-  rc_ratio.value=total>0?(produksi/total).toFixed(2):"";
-  hpp.value=produksi>0?(total/produksi).toFixed(2):"";
+for(const k in dataWilayah){
+  const opt=document.createElement("option");
+  opt.value=k;opt.text=k;kecSelect.appendChild(opt);
 }
-function hitungProduksi(){produksi_total.value=(+produksi_volume.value||0)*(+produksi_harga.value||0);updateRingkasan();}
+function populateDesa(){
+  const dSelect=document.getElementById("desa_kelurahan");
+  dSelect.innerHTML="";
+  const kec=kecSelect.value;
+  if(dataWilayah[kec]){
+    const {kelurahan,desa}=dataWilayah[kec];
+    [...kelurahan,...desa].forEach(n=>{
+      const opt=document.createElement("option");
+      opt.text=n;opt.value=n;dSelect.appendChild(opt);
+    });
+  }
+}
 
+// ==== RINGKASAN ====
+function updateRingkasan(){
+  const produksi=(+produksi_volume.value||0)*(+produksi_harga.value||0);
+  const biaya_tetap=(+sewa_lahan.value||0)+(+penyusutan.value||0);
+  const biaya_variabel=(+benih.value||0)+(+pupuk.value||0)+(+pestisida.value||0)+(+tenaga_kerja.value||0)+(+bahan_bakar.value||0);
+  const total=biaya_tetap+biaya_variabel;
+  biaya_tetap.value=biaya_tetap;
+  biaya_variabel.value=biaya_variabel;
+  total_biaya.value=total;
+  keuntungan.value=produksi-total;
+  rc_ratio.value=total? (produksi/total).toFixed(2):0;
+}
+
+// ==== SUBMIT ====
 document.getElementById("mainForm").addEventListener("submit",e=>{
   e.preventDefault();
-  const data={};document.querySelectorAll("input,select").forEach(el=>data[el.id]=el.value);
+  const data={};
+  document.querySelectorAll("input,select").forEach(el=>data[el.id]=el.value);
   fetch(scriptURL,{method:"POST",body:JSON.stringify(data),headers:{"Content-Type":"application/json"}})
   .then(r=>r.text()).then(()=>{
     alert("✅ Data berhasil dikirim!");
-    document.getElementById("mainForm").reset();
-    currentStep=1;showStep(currentStep);
-  }).catch(err=>{alert("❌ Gagal kirim data: "+err);});
+    e.target.reset();currentStep=1;showStep(currentStep);
+  }).catch(err=>alert("❌ Gagal kirim data: "+err));
 });
 </script>
 </body>
