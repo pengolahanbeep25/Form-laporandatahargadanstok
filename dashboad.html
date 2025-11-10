@@ -109,35 +109,8 @@ function logout() {
   window.location.href = "index.html";
 }
 
-const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
-
-// --- Fungsi bantu ubah format timestamp jadi tanggal normal
-function parseTanggal(ts) {
-  if (!ts) return null;
-  ts = ts.toString().trim();
-
-  // Format: 10/11/2025 11:02:14
-  if (ts.includes("/")) {
-    const [tanggalPart] = ts.split(" ");
-    const [d, m, y] = tanggalPart.split("/");
-    return { d: parseInt(d), m: parseInt(m), y: parseInt(y) };
-  }
-
-  // Format: 10 November 2025
-  const bulanMap = {
-    januari: 1, februari: 2, maret: 3, april: 4, mei: 5, juni: 6,
-    juli: 7, agustus: 8, september: 9, oktober: 10, november: 11, desember: 12
-  };
-  const parts = ts.toLowerCase().split(" ");
-  if (parts.length >= 3) {
-    const d = parseInt(parts[0]);
-    const b = bulanMap[parts[1]] || 0;
-    const y = parseInt(parts[2]);
-    return { d, m: b, y };
-  }
-
-  return null;
-}
+const url =
+  "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
 
 async function loadData() {
   try {
@@ -146,30 +119,42 @@ async function loadData() {
     const header = raw[0];
     const body = raw.slice(1);
 
-    const colTimestamp = header.findIndex(h => h.toLowerCase().includes("timestamp"));
-    const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
-    const colStok = header.findIndex(h => h.toLowerCase().includes("stok gkp"));
-    const colHarga = header.findIndex(h => h.toLowerCase().includes("harga petani gkp"));
+    // Cari posisi kolom
+    const colTimestamp = header.findIndex((h) =>
+      h.toLowerCase().includes("timestamp")
+    );
+    const colNama = header.findIndex((h) =>
+      h.toLowerCase().includes("nama")
+    );
+    const colStok = header.findIndex((h) =>
+      h.toLowerCase().includes("stok gkp")
+    );
+    const colHarga = header.findIndex((h) =>
+      h.toLowerCase().includes("harga petani gkp")
+    );
 
     const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
     const dataPetani = {};
-    daftarPetani.forEach(nama => dataPetani[nama] = null);
+    daftarPetani.forEach((n) => (dataPetani[n] = null));
 
+    // Ambil tanggal hari ini dalam format dd/mm/yyyy
     const today = new Date();
-    const hari = today.getDate();
-    const bulan = today.getMonth() + 1;
-    const tahun = today.getFullYear();
+    const d = String(today.getDate()).padStart(2, "0");
+    const m = String(today.getMonth() + 1).padStart(2, "0");
+    const y = today.getFullYear();
+    const todayStr = `${d}/${m}/${y}`;
 
-    let totalHarga = 0, hitungHarga = 0;
+    let totalHarga = 0,
+      hitungHarga = 0;
 
-    body.forEach(row => {
+    body.forEach((row) => {
+      const ts = (row[colTimestamp] || "").toString();
       const nama = (row[colNama] || "").trim();
       const stok = parseFloat(row[colStok]) || 0;
       const harga = parseFloat(row[colHarga]) || 0;
-      const tsObj = parseTanggal(row[colTimestamp]);
 
-      if (!tsObj || !nama) return;
-      if (tsObj.d === hari && tsObj.m === bulan && tsObj.y === tahun && daftarPetani.includes(nama)) {
+      // Cek kalau timestamp mengandung tanggal hari ini
+      if (ts.includes(todayStr) && daftarPetani.includes(nama)) {
         dataPetani[nama] = stok;
         if (harga > 0) {
           totalHarga += harga;
@@ -181,22 +166,27 @@ async function loadData() {
     const container = document.getElementById("stok-list");
     container.innerHTML = "";
 
-    daftarPetani.forEach(nama => {
+    daftarPetani.forEach((nama) => {
       const div = document.createElement("div");
       div.className = "petani-box";
       if (dataPetani[nama] !== null) {
-        div.innerHTML = `<span>${nama}</span><span>${dataPetani[nama].toLocaleString("id-ID")} kg ✅</span>`;
+        div.innerHTML = `<span>${nama}</span><span>${dataPetani[
+          nama
+        ].toLocaleString("id-ID")} kg ✅</span>`;
       } else {
         div.innerHTML = `<span>${nama}</span><span style="color:#999">Belum update hari ini ❌</span>`;
       }
       container.appendChild(div);
     });
 
-    document.getElementById("harga-rata").textContent =
-      hitungHarga ? "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg" : "-";
-
+    document.getElementById("harga-rata").textContent = hitungHarga
+      ? "Rp " +
+        Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") +
+        "/kg"
+      : "-";
   } catch (err) {
-    document.getElementById("stok-list").textContent = "⚠️ Gagal memuat data";
+    document.getElementById("stok-list").textContent =
+      "⚠️ Gagal memuat data";
     document.getElementById("harga-rata").textContent = "-";
     console.error(err);
   }
@@ -206,6 +196,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
