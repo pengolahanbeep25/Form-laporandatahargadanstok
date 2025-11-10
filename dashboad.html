@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Dinas Pertanian dan Pangan Kabupaten Inhil</title>
+  <title>Dashboard - Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir</title>
   <style>
     * {
       margin: 0;
@@ -47,7 +47,6 @@
       gap: 25px;
     }
 
-    /* Sidebar kiri */
     .sidebar {
       background: rgba(255, 255, 255, 0.9);
       padding: 25px;
@@ -83,7 +82,6 @@
       background: #c93e4a;
     }
 
-    /* Konten tengah */
     .content {
       flex: 1;
       background: rgba(255,255,255,0.92);
@@ -144,14 +142,12 @@
   </header>
 
   <main>
-    <!-- Sidebar Navigasi -->
     <div class="sidebar">
       <a href="form.html" class="btn">📝 Isi Form Laporan</a>
       <a href="tampil.html" class="btn">📊 Lihat Rekap Data</a>
       <a href="#" class="btn logout" onclick="logout()">🚪 Logout</a>
     </div>
 
-    <!-- Konten Tengah -->
     <div class="content">
       <h2>📈 Laporan Interaktif Hari Ini</h2>
 
@@ -173,11 +169,69 @@
   </main>
 
   <footer>
-    © 2025 Dinas Pertanian dan Pangan Kabupaten Indragiri Hilir
+    © 2025 Dinas Pangan Tanaman pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
 
   <script>
-   
+    // Cegah akses tanpa login
+    if (!localStorage.getItem("loginUser")) {
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loginUser");
+      window.location.href = "index.html";
+    }
+
+    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec"; // ganti dengan link kamu
+
+    async function loadData() {
+      try {
+        const res = await fetch(url);
+        const raw = await res.json();
+
+        const header = raw[0];
+        const body = raw.slice(1);
+
+        // Cari posisi kolom sesuai nama
+        const colStok = header.indexOf("stok_gkp");
+        const colHarga = header.indexOf("harga_petani_gkp");
+
+        let totalStok = 0;
+        let totalHarga = 0;
+        let hitungHarga = 0;
+
+        body.forEach(row => {
+          const stok = parseFloat(row[colStok]) || 0;
+          const harga = parseFloat(row[colHarga]) || 0;
+          totalStok += stok;
+          if (harga > 0) {
+            totalHarga += harga;
+            hitungHarga++;
+          }
+        });
+
+        document.getElementById("stok").textContent =
+          totalStok.toLocaleString("id-ID") + " kg";
+        document.getElementById("beras").textContent =
+          "Rp " + Math.round(totalHarga / hitungHarga).toLocaleString("id-ID") + "/kg";
+        document.getElementById("tanggal").textContent =
+          new Date().toLocaleDateString("id-ID", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+
+      } catch (err) {
+        document.getElementById("stok").textContent = "⚠️ Gagal memuat data";
+        document.getElementById("beras").textContent = "-";
+        document.getElementById("tanggal").textContent = "-";
+        console.error(err);
+      }
+    }
+
+    loadData();
   </script>
 </body>
 </html>
