@@ -100,7 +100,8 @@
   <footer>
     © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
   </footer>
-<script>
+
+  <script>
 if (!localStorage.getItem("loginUser")) window.location.href = "index.html";
 function logout() {
   localStorage.removeItem("loginUser");
@@ -117,8 +118,8 @@ async function loadData() {
     const body = raw.slice(1);
 
     const colNama = header.findIndex(h => h.toLowerCase().includes("nama"));
-    const colStok = header.findIndex(h => h.toLowerCase().includes("stok_gkp"));
-    const colHarga = header.findIndex(h => h.toLowerCase().includes("harga_petani_gkp"));
+    const colStok = header.findIndex(h => h.toLowerCase().includes("stok gkp"));
+    const colHarga = header.findIndex(h => h.toLowerCase().includes("harga petani gkp"));
     const colTimestamp = 0;
 
     const daftarPetani = ["Wahab", "Misbar", "Aswad", "Legi"];
@@ -126,15 +127,14 @@ async function loadData() {
     let totalHarga = 0, hitungHarga = 0;
     daftarPetani.forEach(nama => dataPetani[nama] = null);
 
-    const bulanMap = [
+    // Dapatkan tanggal dan bulan sekarang (huruf kecil)
+    const today = new Date();
+    const hari = today.getDate().toString();
+    const bulanList = [
       "januari", "februari", "maret", "april", "mei", "juni",
       "juli", "agustus", "september", "oktober", "november", "desember"
     ];
-
-    const now = new Date();
-    const hari = now.getDate().toString();
-    const bulan = bulanMap[now.getMonth()]; // nama bulan sekarang, contoh "november"
-    const shortMonth = (now.getMonth() + 1).toString().padStart(2, "0"); // contoh "11"
+    const bulanNow = bulanList[today.getMonth()];
 
     body.forEach(row => {
       const nama = (row[colNama] || "").trim();
@@ -142,12 +142,8 @@ async function loadData() {
       const harga = parseFloat(row[colHarga]) || 0;
       const ts = (row[colTimestamp] || "").toString().toLowerCase();
 
-      // baca semua bentuk: 10/11/2025, 10 November 2025, dst
-      if (
-        ts.includes(`${hari} ${bulan}`) ||        // format "10 november"
-        ts.includes(`${hari}/${shortMonth}/`) ||  // format "10/11/2025"
-        ts.includes(`${hari}-${shortMonth}-`)     // format "10-11-2025"
-      ) {
+      // deteksi tanggal hari ini (contoh "10 november 2025")
+      if (ts.includes(`${hari} ${bulanNow}`)) {
         if (daftarPetani.includes(nama)) {
           dataPetani[nama] = stok;
           if (harga > 0) {
@@ -186,6 +182,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
