@@ -216,22 +216,36 @@ function updateRingkasan(){
 }
 
 // Submit ke spreadsheet
-document.getElementById("submit").addEventListener("click",()=>{
-  const url="https://script.google.com/macros/s/AKfycbxWLjKqRnikk21XD5DbaXYTO_JIaQ7XhGHOERHfgGPYT7GO78deTtVuqwqfKOEdTbUa/exec";
-  const formData=new FormData(document.getElementById("formUsahaTani"));
-  const data={};
-  formData.forEach((v,k)=>data[k]=v);
-  fetch(url,{method:"POST",body:new URLSearchParams(data)})
-  .then(res=>res.json())
-  .then(res=>{
-    if(res.result==="success"){
-      alert("Data berhasil dikirim!");
-      document.getElementById("formUsahaTani").reset();
-      step2.classList.remove("active"); step1.classList.add("active");
-    } else alert("Gagal mengirim data");
-  })
-  .catch(err=>alert("Error: "+err));
+<script>
+document.getElementById("submit").addEventListener("click", () => {
+  const url = "https://script.google.com/macros/s/AKfycbxWLjKqRnikk21XD5DbaXYTO_JIaQ7XhGHOERHfgGPYT7GO78deTtVuqwqfKOEdTbUa/exec";
+  const form = document.getElementById("formUsahaTani");
+  const formData = new FormData(form);
+  const data = {};
+  formData.forEach((v, k) => data[k] = v);
+
+  // kasih feedback langsung (tanpa nunggu respon)
+  alert("✅ Data sedang dikirim ke Spreadsheet...");
+
+  // kirim data ke Google Apps Script (tanpa block UI)
+  fetch(url, { method: "POST", body: new URLSearchParams(data) })
+    .then(res => res.json())
+    .then(res => {
+      if (res.result === "success") {
+        console.log("✅ Data tersimpan di Spreadsheet!");
+      } else {
+        alert("⚠️ Gagal menyimpan data ke Spreadsheet");
+      }
+    })
+    .catch(err => console.error("Error:", err));
+
+  // langsung reset form dan kembali ke Step 1
+  form.reset();
+  step2.classList.remove("active");
+  step1.classList.add("active");
 });
+</script>
 </script>
 </body>
 </html>
+
