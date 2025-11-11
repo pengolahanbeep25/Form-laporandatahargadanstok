@@ -6,18 +6,18 @@
 <title>Form Usaha Tani Lengkap</title>
 <style>
 body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    margin: 0; padding: 0;
-    background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
-    background-size: cover;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  margin: 0; padding: 0;
+  background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
+  background-size: cover;
 }
 .container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: rgba(255,255,255,0.95);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  max-width: 1200px;
+  margin: 30px auto;
+  background: rgba(255,255,255,0.95);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 .step { display: none; }
 .step.active { display: block; }
@@ -62,7 +62,7 @@ input[readonly] { background-color: #e9ecef; }
     <div class="form-group"><label>Desa/Kelurahan *</label><input type="text" id="desa" name="desa"></div>
     <div class="form-group"><label>Alamat *</label><input type="text" id="alamat" name="alamat"></div>
     <div class="form-group"><label>Jenis Lahan *</label><input type="text" id="jenisLahan" name="jenisLahan"></div>
-    <div class="form-group"><label>Luas Lahan *</label><input type="number" id="luasLahan" name="luasLahan"></div>
+    <div class="form-group"><label>Luas Lahan (Ha) *</label><input type="number" id="luasLahan" name="luasLahan"></div>
     <div class="form-group"><label>Varietas *</label><input type="text" id="varietas" name="varietas"></div>
     <div class="form-group"><label>Periode Tanam *</label><input type="text" id="periodeTanam" name="periodeTanam"></div>
     <div class="form-group"><label>Umur Panen (Hari) *</label><input type="number" id="umurPanen" name="umurPanen"></div>
@@ -119,30 +119,57 @@ produksiVol.addEventListener("input",calcProduksi);
 produksiHarga.addEventListener("input",calcProduksi);
 
 // Field generator
-const biayaTetapFields=["Sewa Lahan","Cangkul","Sabit/Parang","Traktor","Power Thresher","Combine","Lainnya"];
-const biayaVariabelFields=["Bibit/Benih","Pupuk UREA","Pupuk NPK","Pupuk ORGANIK","Pupuk TSP","Pupuk KCL","Pupuk Daun Cair","Pupuk ZA","Pupuk Lainnya","Pestisida Prepaton","Pestisida Regent","Pestisida Spontan","Pestisida Herbisida","Pestisida DIMECTIN","Pestisida Obat Wereng (Plenum)","Pestisida Lainnya","Upah Harian","Upah Borongan","Sewa Alat/Sarana","Bahan Bakar","Bunga","PBB","Lainnya"];
+const biayaTetapFields=[
+  {name:"Sewa Lahan", unit:"Ha"},
+  {name:"Cangkul", unit:"Unit"},
+  {name:"Sabit/Parang", unit:"Unit"},
+  {name:"Traktor", unit:"Unit"},
+  {name:"Power Thresher", unit:"Unit"},
+  {name:"Combine", unit:"Unit"},
+  {name:"Lainnya", unit:"Unit"}
+];
 
-function createFields(containerId,fields){
+const biayaVariabelFields=[
+  {name:"Bibit/Benih", unit:"Kg"},
+  {name:"Pupuk UREA", unit:"Kg"},
+  {name:"Pupuk NPK", unit:"Kg"},
+  {name:"Pupuk ORGANIK", unit:"Kg"},
+  {name:"Pupuk TSP", unit:"Kg"},
+  {name:"Pupuk KCL", unit:"Kg"},
+  {name:"Pupuk Daun Cair", unit:"Liter"},
+  {name:"Pupuk ZA", unit:"Kg"},
+  {name:"Pupuk Lainnya", unit:"Kg"},
+  {name:"Pestisida Prepaton", unit:"Liter"},
+  {name:"Pestisida Regent", unit:"Liter"},
+  {name:"Pestisida Spontan", unit:"Liter"},
+  {name:"Pestisida Herbisida", unit:"Liter"},
+  {name:"Pestisida DIMECTIN", unit:"Liter"},
+  {name:"Pestisida Obat Wereng (Plenum)", unit:"Liter"},
+  {name:"Pestisida Lainnya", unit:"Liter"},
+  {name:"Upah Harian", unit:"Rp"},
+  {name:"Upah Borongan", unit:"Rp"},
+  {name:"Sewa Alat/Sarana", unit:"Unit"},
+  {name:"Bahan Bakar", unit:"Liter"},
+  {name:"Bunga", unit:"Rp"},
+  {name:"PBB", unit:"Rp"},
+  {name:"Lainnya", unit:"Rp"}
+];
+
+function createFields(containerId, fields){
   const container=document.getElementById(containerId);
   fields.forEach(f=>{
     const div=document.createElement("div");
     div.classList.add("section-card");
-    div.innerHTML=`<h4>${f}</h4>
+    div.innerHTML=`
+      <h4>${f.name}</h4>
       <div class="form-group">
-  <label>Volume</label>
-  <div style="display:flex; gap:10px;">
-    <input type="number" class="vol" data-name="${f}" placeholder="Masukkan volume" style="flex:1;">
-    <select class="satuan" data-name="${f}">
-      <option value="Kg">Kg</option>
-      <option value="Unit">Unit</option>
-      <option value="Ha">Ha</option>
-      <option value="Liter">Liter</option>
-    </select>
-  </div>
-</div>
-      <div class="form-group"><label>Harga</label><input type="number" class="harga" data-name="${f}"></div>
-      <div class="form-group"><label>Total</label><input type="number" class="total" data-name="${f}" readonly></div>
-      <div class="form-group"><label>Persentase (%)</label><input type="number" class="persentase" data-name="${f}" readonly></div>`;
+        <label>Volume (${f.unit})</label>
+        <input type="number" class="vol" data-name="${f.name}" placeholder="Masukkan volume (${f.unit})">
+      </div>
+      <div class="form-group"><label>Harga (Rp)</label><input type="number" class="harga" data-name="${f.name}"></div>
+      <div class="form-group"><label>Total (Rp)</label><input type="number" class="total" data-name="${f.name}" readonly></div>
+      <div class="form-group"><label>Persentase (%)</label><input type="number" class="persentase" data-name="${f.name}" readonly></div>
+    `;
     container.appendChild(div);
   });
 }
@@ -190,13 +217,19 @@ function updateRingkasan(){
 
 // Submit ke spreadsheet
 document.getElementById("submit").addEventListener("click",()=>{
-  const url = "https://script.google.com/macros/s/AKfycbxWLjKqRnikk21XD5DbaXYTO_JIaQ7XhGHOERHfgGPYT7GO78deTtVuqwqfKOEdTbUa/exec";
-  const formData = new FormData(document.getElementById("formUsahaTani"));
-  const data = {};
+  const url="https://script.google.com/macros/s/AKfycbxWLjKqRnikk21XD5DbaXYTO_JIaQ7XhGHOERHfgGPYT7GO78deTtVuqwqfKOEdTbUa/exec";
+  const formData=new FormData(document.getElementById("formUsahaTani"));
+  const data={};
   formData.forEach((v,k)=>data[k]=v);
   fetch(url,{method:"POST",body:new URLSearchParams(data)})
   .then(res=>res.json())
-  .then(res=>{ if(res.result==="success"){ alert("Data berhasil dikirim!"); document.getElementById("formUsahaTani").reset(); step2.classList.remove("active"); step1.classList.add("active"); } else alert("Gagal mengirim data"); })
+  .then(res=>{
+    if(res.result==="success"){
+      alert("Data berhasil dikirim!");
+      document.getElementById("formUsahaTani").reset();
+      step2.classList.remove("active"); step1.classList.add("active");
+    } else alert("Gagal mengirim data");
+  })
   .catch(err=>alert("Error: "+err));
 });
 </script>
