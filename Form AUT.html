@@ -3,247 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Form Usaha Tani Lengkap</title>
+<title>Form Input Data Usaha Tani</title>
+
 <style>
-body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  margin: 0; padding: 0;
-  background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
-  background-size: cover;
-}
-.container {
-  max-width: 1200px;
-  margin: 30px auto;
-  background: rgba(255,255,255,0.95);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-.step { display: none; }
-.step.active { display: block; }
-h1,h2,h3,h4 { margin-top: 20px; color: #333; }
-h1 { text-align: center; font-size: 2em; }
-h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; color: #4CAF50; }
-.form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
-input, select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
-input[readonly] { background-color: #e9ecef; }
-.buttons { margin-top: 20px; text-align: right; }
-.buttons button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.3s; }
-#next1 { background-color: #4CAF50; color: white; }
-#next1:hover { background-color: #45a049; }
-#back2 { background-color: #f0ad4e; color: white; }
-#back2:hover { background-color: #ec971f; }
-#submit { background-color: #007BFF; color: white; }
-#submit:hover { background-color: #0069d9; }
-.section-card { background: #fff; padding: 15px 30px; border-radius: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
-.section-card h4 { color: #4CAF50; margin-bottom: 10px; }
-@media(max-width:768px){ .container { padding: 20px; margin: 10px; } .buttons { text-align: center; } .buttons button { margin-bottom: 10px; width: 45%; } }
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f0f0;
+    }
+    .container {
+        max-width: 850px;
+        background: white;
+        padding: 20px;
+        margin: auto;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #999;
+    }
+    label {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: 1px solid #aaa;
+    }
+    .alat-item {
+        background: #fafafa;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+    button {
+        margin-top: 15px;
+        padding: 12px;
+        width: 100%;
+        background: green;
+        color: white;
+        border: 0;
+        border-radius: 6px;
+        font-size: 18px;
+    }
 </style>
 </head>
 <body>
+
 <div class="container">
-<h1>Form Input Usaha Tani Lengkap</h1>
+<h2>Form Input Usaha Tani</h2>
 
-<form id="formUsahaTani">
+<form id="mainForm">
 
-<!-- STEP 1 -->
-<div class="step active" id="step1">
-  <h2>Step 1: Data Dasar & Penerimaan</h2>
-  <div class="section-card">
-    <h3>B) Data Dasar</h3>
-    <div class="form-group"><label>Nama PIC *</label><input type="text" id="namaPIC" name="namaPIC"></div>
-    <div class="form-group"><label>No. HP PIC *</label><input type="text" id="hpPIC" name="hpPIC" placeholder="08XXXXXXXXXX"></div>
-    <div class="form-group"><label>Jenis Kelompok *</label><select id="jenisKelompok" name="jenisKelompok"><option>Poktan</option><option>Gapoktan</option><option>KWT</option></select></div>
-    <div class="form-group"><label>Nama Kelompok *</label><input type="text" id="namaKelompok" name="namaKelompok"></div>
-    <div class="form-group"><label>Provinsi *</label><input type="text" id="provinsi" name="provinsi" placeholder="Masukkan nama provinsi"></div>
-    <div class="form-group"><label>Kota/Kabupaten *</label><input type="text" id="kota" name="kota" placeholder="Masukkan nama kota/kabupaten"></div>
-    <div class="form-group"><label>Kecamatan *</label><input type="text" id="kecamatan" name="kecamatan"></div>
-    <div class="form-group"><label>Desa/Kelurahan *</label><input type="text" id="desa" name="desa"></div>
-    <div class="form-group"><label>Alamat *</label><input type="text" id="alamat" name="alamat"></div>
-    <div class="form-group"><label>Jenis Lahan *</label><input type="text" id="jenisLahan" name="jenisLahan"></div>
-    <div class="form-group"><label>Luas Lahan (Ha) *</label><input type="number" id="luasLahan" name="luasLahan"></div>
-    <div class="form-group"><label>Varietas *</label><input type="text" id="varietas" name="varietas"></div>
-    <div class="form-group"><label>Periode Tanam *</label><input type="text" id="periodeTanam" name="periodeTanam"></div>
-    <div class="form-group"><label>Umur Panen (Hari) *</label><input type="number" id="umurPanen" name="umurPanen"></div>
-  </div>
+    <label>Nama Petani</label>
+    <input type="text" name="Nama_Petani" required>
 
-  <div class="section-card">
-    <h3>C) Penerimaan</h3>
-    <div class="form-group"><label>Produksi (Volume) (Kg)</label><input type="number" id="produksiVolume" name="produksiVolume"></div>
-    <div class="form-group"><label>Produksi (Harga) (Rp)</label><input type="number" id="produksiHarga" name="produksiHarga"></div>
-    <div class="form-group"><label>Produksi (Total) (Rp)</label><input type="number" id="produksiTotal" name="produksiTotal" readonly></div>
-  </div>
+    <label>No HP</label>
+    <input type="text" name="No_HP" required>
 
-  <div class="buttons"><button type="button" id="next1">Next</button></div>
-</div>
+    <label>Nama Kelompok</label>
+    <input type="text" name="Nama_Kelompok">
 
-<!-- STEP 2 -->
-<div class="step" id="step2">
-  <h2>Step 2: Biaya Produksi & Ringkasan</h2>
-  <div class="section-card" id="biayaTetapContainer"></div>
-  <div class="section-card" id="biayaVariabelContainer"></div>
+    <label>Provinsi</label>
+    <input type="text" name="Provinsi" value="Riau">
 
-  <div class="section-card">
-    <h3>E) Ringkasan</h3>
-    <div class="form-group"><label>Biaya Tetap (Total)</label><input type="number" id="biayaTetapTotal" readonly></div>
-    <div class="form-group"><label>Biaya Variabel (Total)</label><input type="number" id="biayaVariabelTotal" readonly></div>
-    <div class="form-group"><label>Biaya Produksi (Total)</label><input type="number" id="biayaProduksiTotal" readonly></div>
-    <div class="form-group"><label>Keuntungan Usaha Tani (Rp)</label><input type="number" id="keuntungan" readonly></div>
-    <div class="form-group"><label>R/C</label><input type="number" id="rc" readonly></div>
-    <div class="form-group"><label>BEP (Rp/Kg)</label><input type="number" id="bep" readonly></div>
-    <div class="form-group"><label>HPP (Rp)</label><input type="number" id="hpp" readonly></div>
-  </div>
+    <label>Kabupaten</label>
+    <input type="text" name="Kabupaten" value="Indragiri Hilir">
 
-  <div class="buttons">
-    <button type="button" id="back2">Back</button>
-    <button type="button" id="submit">Submit</button>
-  </div>
-</div>
+    <label>Kecamatan</label>
+    <input type="text" name="Kecamatan">
+
+    <label>Desa</label>
+    <input type="text" name="Desa">
+
+    <hr><h3>Alat & Bahan</h3>
+
+    <div id="alatContainer"></div>
+
+    <button type="submit">Kirim Data</button>
 </form>
 </div>
 
 <script>
-// Step navigation
-const step1=document.getElementById("step1");
-const step2=document.getElementById("step2");
-document.getElementById("next1").addEventListener("click",()=>{ step1.classList.remove("active"); step2.classList.add("active"); });
-document.getElementById("back2").addEventListener("click",()=>{ step2.classList.remove("active"); step1.classList.add("active"); });
-
-// Produksi total
-const produksiVol=document.getElementById("produksiVolume");
-const produksiHarga=document.getElementById("produksiHarga");
-const produksiTotal=document.getElementById("produksiTotal");
-function calcProduksi(){ produksiTotal.value=Number(produksiVol.value)*Number(produksiHarga.value); updateRingkasan(); }
-produksiVol.addEventListener("input",calcProduksi);
-produksiHarga.addEventListener("input",calcProduksi);
-
-// Field generator
-const biayaTetapFields=[
-  {name:"Sewa Lahan", unit:"Ha"},
-  {name:"Cangkul", unit:"Unit"},
-  {name:"Sabit/Parang", unit:"Unit"},
-  {name:"Traktor", unit:"Unit"},
-  {name:"Power Thresher", unit:"Unit"},
-  {name:"Combine", unit:"Unit"},
-  {name:"Lainnya", unit:"Unit"}
+/* ===============================
+   1. LIST ALAT – BISA KAU TAMBAH
+   =============================== */
+const alatList = [
+    "Cangkul",
+    "Parang",
+    "Traktor",
+    "Pupuk_Urea",
+    "Pupuk_NPK",
+    "Pestisida",
+    "Benih_Padi",
+    "Sabit",
+    "Handsprit",
+    "Herbisida"
 ];
 
-const biayaVariabelFields=[
-  {name:"Bibit/Benih", unit:"Kg"},
-  {name:"Pupuk UREA", unit:"Kg"},
-  {name:"Pupuk NPK", unit:"Kg"},
-  {name:"Pupuk ORGANIK", unit:"Kg"},
-  {name:"Pupuk TSP", unit:"Kg"},
-  {name:"Pupuk KCL", unit:"Kg"},
-  {name:"Pupuk Daun Cair", unit:"Liter"},
-  {name:"Pupuk ZA", unit:"Kg"},
-  {name:"Pupuk Lainnya", unit:"Kg"},
-  {name:"Pestisida Prepaton", unit:"Liter"},
-  {name:"Pestisida Regent", unit:"Liter"},
-  {name:"Pestisida Spontan", unit:"Liter"},
-  {name:"Pestisida Herbisida", unit:"Liter"},
-  {name:"Pestisida DIMECTIN", unit:"Liter"},
-  {name:"Pestisida Obat Wereng (Plenum)", unit:"Liter"},
-  {name:"Pestisida Lainnya", unit:"Liter"},
-  {name:"Upah Harian", unit:"Rp"},
-  {name:"Upah Borongan", unit:"Rp"},
-  {name:"Sewa Alat/Sarana", unit:"Unit"},
-  {name:"Bahan Bakar", unit:"Liter"},
-  {name:"Bunga", unit:"Rp"},
-  {name:"PBB", unit:"Rp"},
-  {name:"Lainnya", unit:"Rp"}
-];
+/* ======================================
+   2. GENERATE FIELD ALAT DENGAN NAME OTOMATIS
+   ====================================== */
+function generateAlatFields() {
+    const container = document.getElementById("alatContainer");
 
-function createFields(containerId, fields){
-  const container=document.getElementById(containerId);
-  fields.forEach(f=>{
-    const div=document.createElement("div");
-    div.classList.add("section-card");
-    div.innerHTML=`
-      <h4>${f.name}</h4>
-      <div class="form-group">
-        <label>Volume (${f.unit})</label>
-        <input type="number" class="vol" data-name="${f.name}" placeholder="Masukkan volume (${f.unit})">
-      </div>
-      <div class="form-group"><label>Harga (Rp)</label><input type="number" class="harga" data-name="${f.name}"></div>
-      <div class="form-group"><label>Total (Rp)</label><input type="number" class="total" data-name="${f.name}" readonly></div>
-      <div class="form-group"><label>Persentase (%)</label><input type="number" class="persentase" data-name="${f.name}" readonly></div>
-    `;
-    container.appendChild(div);
-  });
+    alatList.forEach(nama => {
+        const item = document.createElement("div");
+        item.className = "alat-item";
+
+        item.innerHTML = `
+            <label>${nama.replace(/_/g, " ")}</label>
+
+            Volume:
+            <input type="number" name="${nama}_vol" min="0">
+
+            Harga Satuan:
+            <input type="number" name="${nama}_harga" min="0">
+
+            Total:
+            <input type="number" name="${nama}_total" min="0">
+        `;
+
+        container.appendChild(item);
+    });
 }
-createFields("biayaTetapContainer",biayaTetapFields);
-createFields("biayaVariabelContainer",biayaVariabelFields);
+generateAlatFields();
 
-// Kalkulasi otomatis
-document.body.addEventListener("input",e=>{
-  if(e.target.classList.contains("vol")||e.target.classList.contains("harga")){
-    const name=e.target.dataset.name;
-    const vol=Number(document.querySelector(`.vol[data-name='${name}']`).value);
-    const harga=Number(document.querySelector(`.harga[data-name='${name}']`).value);
-    const totalInput=document.querySelector(`.total[data-name='${name}']`);
-    totalInput.value=vol*harga;
-    updateRingkasan();
-  }
-});
+/* ================================
+   3. KIRIM DATA KE GOOGLE SHEETS
+   ================================ */
 
-function updateRingkasan(){
-  let bt=0,bv=0;
-  document.querySelectorAll("#biayaTetapContainer .total").forEach(i=>bt+=Number(i.value));
-  document.querySelectorAll("#biayaVariabelContainer .total").forEach(i=>bv+=Number(i.value));
+const scriptURL = "https://script.google.com/macros/s/AKfycbz5Y0Smj5iuQsRv-62HjsfiI0D-K46k6n0BVf-oNC1xTqfcSfKC4MdXwG0zzQaD0H5U/exec";  // ← GANTI BAGIAN INI
+const form = document.getElementById("mainForm");
 
-  document.querySelectorAll("#biayaTetapContainer .total").forEach(i=>{
-    const pers=document.querySelector(`.persentase[data-name='${i.dataset.name}']`);
-    pers.value = bt ? ((Number(i.value)/bt)*100).toFixed(2) : 0;
-  });
-  document.querySelectorAll("#biayaVariabelContainer .total").forEach(i=>{
-    const pers=document.querySelector(`.persentase[data-name='${i.dataset.name}']`);
-    pers.value = bv ? ((Number(i.value)/bv)*100).toFixed(2) : 0;
-  });
+form.addEventListener("submit", e => {
+    e.preventDefault();
 
-  document.getElementById("biayaTetapTotal").value=bt;
-  document.getElementById("biayaVariabelTotal").value=bv;
-  document.getElementById("biayaProduksiTotal").value=bt+bv;
+    const data = new FormData(form);
 
-  const prodTotal=Number(produksiTotal.value);
-  const biayaTotal=bt+bv;
-  document.getElementById("keuntungan").value=prodTotal-biayaTotal;
-  document.getElementById("rc").value=biayaTotal? (prodTotal/biayaTotal).toFixed(2) : 0;
-  const vol=Number(produksiVol.value||1);
-  document.getElementById("bep").value=(biayaTotal/vol).toFixed(2);
-  document.getElementById("hpp").value=(biayaTotal/vol).toFixed(2);
-}
-
-// Submit ke spreadsheet
-document.getElementById("submit").addEventListener("click", () => {
-  const url = "https://script.google.com/macros/s/AKfycbxWLjKqRnikk21XD5DbaXYTO_JIaQ7XhGHOERHfgGPYT7GO78deTtVuqwqfKOEdTbUa/exec";
-  const form = document.getElementById("formUsahaTani");
-  const formData = new FormData(form);
-  const data = {};
-  formData.forEach((v, k) => data[k] = v);
-
-  // kasih feedback langsung (tanpa nunggu respon)
-  alert("✅ Data sedang dikirim ke Spreadsheet...");
-
-  // kirim data ke Google Apps Script (tanpa block UI)
-  fetch(url, { method: "POST", body: new URLSearchParams(data) })
-    .then(res => res.json())
-    .then(res => {
-      if (res.result === "success") {
-        console.log("✅ Data tersimpan di Spreadsheet!");
-      } else {
-        alert("⚠️ Gagal menyimpan data ke Spreadsheet");
-      }
-    })
-    .catch(err => console.error("Error:", err));
-
-  // langsung reset form dan kembali ke Step 1
-  form.reset();
-  step2.classList.remove("active");
-  step1.classList.add("active");
+    fetch(scriptURL, { method: "POST", body: data })
+        .then(res => {
+            alert("Data berhasil dikirim!");
+            form.reset();
+        })
+        .catch(err => {
+            alert("Gagal mengirim! Cek koneksi atau Apps Script");
+            console.error(err);
+        });
 });
 </script>
+
 </body>
 </html>
-
