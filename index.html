@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Sistem Dinas</title>
+  <title>Login – Sistem Laporan Dinas</title>
   <style>
     * {
       margin: 0;
@@ -13,27 +13,30 @@
     }
 
     body {
-      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-                  no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)),
+        url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
+        no-repeat center / cover;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      color: #fff;
     }
 
     header {
-      background: rgba(21, 71, 52, 0.95);
-      color: white;
-      padding: 18px 0;
+      background: rgba(0,0,0,0.45);
+      padding: 20px 10px;
       text-align: center;
+      font-size: 1.15em;
       font-weight: 700;
-      backdrop-filter: blur(3px);
+      letter-spacing: 0.4px;
+      backdrop-filter: blur(6px);
     }
 
     header small {
       display: block;
-      font-weight: normal;
-      font-size: 0.9em;
+      font-size: 0.82em;
+      font-weight: 400;
+      opacity: 0.9;
       margin-top: 3px;
     }
 
@@ -46,90 +49,130 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 35px 50px;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-      max-width: 420px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+      padding: 45px 40px;
+      border-radius: 22px;
       width: 100%;
-      backdrop-filter: blur(6px);
+      max-width: 380px;
+      text-align: center;
+      animation: fade 0.6s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
-      color: #154734;
-      font-size: 1.4em;
-      margin-bottom: 10px;
+      font-size: 1.55em;
+      margin-bottom: 12px;
+      font-weight: 700;
+      color: #fff;
     }
 
     p {
       font-size: 0.95em;
-      color: #333;
-      margin-bottom: 25px;
+      margin-bottom: 28px;
+      opacity: 0.92;
+    }
+
+    .inputBox {
+      margin-bottom: 14px;
+      position: relative;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
+      padding: 12px 14px 12px 40px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    input:focus {
+      border-color: #93ffc8;
+      box-shadow: 0 0 6px rgba(147,255,200,0.5);
+      background: rgba(255,255,255,0.22);
+    }
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      font-size: 17px;
+      opacity: 0.85;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background: #196d3f;
+      padding: 13px;
+      background: #1c8a58;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 600;
       font-size: 15px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.25s ease;
       margin-top: 10px;
     }
 
     button:hover {
-      background: #1e8c51;
+      background: #23a76a;
+      transform: translateY(-2px);
     }
 
     .error {
-      color: #b02a37;
-      margin-top: 10px;
+      color: #ffb9b9;
+      margin-top: 12px;
       font-size: 0.9em;
+      min-height: 22px;
     }
 
     footer {
       text-align: center;
-      font-size: 0.85em;
-      color: #fff;
+      font-size: 0.82em;
       padding: 12px;
-      background: rgba(21, 71, 52, 0.85);
-      backdrop-filter: blur(3px);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
     }
   </style>
 </head>
 <body>
   <header>
-    DINAS PERTANIAN DAN PANGAN KABUPATEN INHIL
-    <small>Sistem Laporan Stok, Produksi, dan Harga Gabah/Beras</small>
+    DINAS PERTANIAN DAN PANGAN KABUPATEN INDRAGIRI HILIR
+    <small>Sistem Laporan Stok • Produksi • Harga Gabah & Beras</small>
   </header>
 
   <main>
     <div class="card">
-      <h2>Login Sistem</h2>
-      <p>Masukkan username dan password Anda.</p>
-      <input type="text" id="username" placeholder="Username" autocomplete="off">
-      <input type="password" id="password" placeholder="Password" autocomplete="off">
+      <h2>🔐 Login Sistem</h2>
+      <p>Masukkan username dan password Anda</p>
+
+      <div class="inputBox">
+        <span class="icon">👤</span>
+        <input type="text" id="username" placeholder="Username" autocomplete="off">
+      </div>
+
+      <div class="inputBox">
+        <span class="icon">🔑</span>
+        <input type="password" id="password" placeholder="Password" autocomplete="off">
+      </div>
+
       <button onclick="login()">Masuk</button>
       <div class="error" id="errorMsg"></div>
     </div>
   </main>
 
   <footer>
-    © 2025 Dinas Pertanian dan Pangan Kabupaten Indragiri Hilir
+    © 2025 Dinas Pangan Tanaman Pangan Hortikultura & Peternakan – Kabupaten Indragiri Hilir
   </footer>
 
   <script>
@@ -143,7 +186,6 @@
         return;
       }
 
-      // daftar akun (bisa tambah sesuai kebutuhan)
       const akun = {
         kabidtph: "12345",
         kabidkdp: "12345",
@@ -154,20 +196,16 @@
       if (akun[user] && akun[user] === pass) {
         localStorage.setItem("loginUser", user);
 
-        // arahkan berdasarkan user
         if (user === "kadis" || user === "kabidtph" || user === "kabidkdp") {
           window.location.href = "dashboad.html";
         } else if (user === "petani") {
           window.location.href = "form.html";
-        } else {
-          msg.textContent = "Akun tidak dikenali.";
         }
       } else {
         msg.textContent = "Username atau password salah.";
       }
     }
 
-    // tekan Enter untuk login
     document.addEventListener("keypress", e => {
       if (e.key === "Enter") login();
     });
