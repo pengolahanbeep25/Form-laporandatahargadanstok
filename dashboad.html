@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir</title>
+  <title>Dashboard – Dinas Pertanian & Pangan Inhil</title>
   <style>
     * {
       margin: 0;
@@ -13,29 +13,31 @@
     }
 
     body {
-      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-                  no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)),
+        url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
+        no-repeat center / cover;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
-      color: #154734;
+      color: #fff;
     }
 
     header {
-      background: rgba(21, 71, 52, 0.95);
-      color: white;
-      padding: 18px 0;
+      padding: 20px 10px;
+      background: rgba(0,0,0,0.45);
       text-align: center;
+      font-size: 1.15em;
       font-weight: 700;
-      backdrop-filter: blur(3px);
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(6px);
     }
 
     header small {
       display: block;
-      font-weight: normal;
-      font-size: 0.9em;
-      margin-top: 3px;
+      font-size: 0.82em;
+      font-weight: 400;
+      opacity: 0.9;
+      margin-top: 4px;
     }
 
     main {
@@ -43,93 +45,101 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40px 20px;
+      padding: 35px 15px;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.92);
-      padding: 35px 50px;
-      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 45px 35px;
+      border-radius: 20px;
       text-align: center;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
-      backdrop-filter: blur(6px);
-      max-width: 420px;
       width: 100%;
+      max-width: 460px;
+      animation: fade 0.5s ease-in-out;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
-      color: #154734;
-      font-size: 1.4em;
-      margin-bottom: 15px;
+      font-size: 1.55em;
+      margin-bottom: 18px;
+      font-weight: 700;
+      color: #fff;
     }
 
     p {
       font-size: 0.95em;
-      color: #333;
-      margin-bottom: 25px;
+      margin-bottom: 28px;
+      opacity: 0.9;
     }
 
     .btn {
       display: block;
-      background: #196d3f;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.28);
       color: #fff;
-      text-decoration: none;
-      padding: 12px 0;
-      border-radius: 8px;
+      padding: 13px 0;
+      border-radius: 10px;
+      margin: 9px 0;
       font-weight: 600;
-      margin: 10px 0;
-      transition: background 0.3s ease;
+      backdrop-filter: blur(6px);
+      transition: 0.25s ease;
+      text-decoration: none;
     }
 
     .btn:hover {
-      background: #1e8c51;
+      background: rgba(255,255,255,0.35);
+      transform: translateY(-2px);
     }
 
     .logout {
-      background: #b02a37;
+      background: rgba(226, 30, 30, 0.55);
+      border-color: rgba(226, 30, 30, 0.5);
     }
 
     .logout:hover {
-      background: #c93e4a;
+      background: rgba(255, 52, 52, 0.72);
     }
 
     footer {
       text-align: center;
-      font-size: 0.85em;
-      color: #fff;
+      font-size: 0.82em;
       padding: 12px;
-      background: rgba(21, 71, 52, 0.85);
-      backdrop-filter: blur(3px);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
     }
   </style>
 </head>
 <body>
   <header>
-    DINAS PERTANIAN DAN PANGAN KABUPATEN INHIL
-    <small>Sistem Laporan Stok, Produksi, dan Harga Gabah/Beras</small>
+    DINAS PERTANIAN DAN PANGAN KABUPATEN INDRAGIRI HILIR
+    <small>Sistem Laporan Stok • Produksi • Harga Gabah & Beras</small>
   </header>
 
   <main>
     <div class="card">
       <h2>📊 Dashboard Utama</h2>
-      <p>Silakan pilih menu untuk melanjutkan.</p>
+      <p>Pilih menu untuk mulai bekerja.</p>
       <a href="form.html" class="btn">📝 Isi Form Laporan</a>
-      <a href="Form AUT.html" class="btn">📝 Form Analisi Usaha Tani</a>
-      <a href="tampil.html" class="btn">📊 Lihat Rekap Data</a>
+      <a href="Form AUT.html" class="btn">📋 Form Analisis Usaha Tani</a>
+      <a href="tampil.html" class="btn">📈 Lihat Rekapitulasi Data</a>
       <a href="#" class="btn logout" onclick="logout()">🚪 Logout</a>
     </div>
   </main>
 
   <footer>
-    © 2025 Dinas Pangan Tanaman Pangan Hortikultura dan Peternakan Kabupaten Indragiri Hilir
+    © 2025 Dinas Pangan Tanaman Pangan Hortikultura & Peternakan – Kabupaten Indragiri Hilir
   </footer>
 
   <script>
-    // Cegah akses tanpa login
     if (!localStorage.getItem("loginUser")) {
       window.location.href = "index.html";
     }
-
     function logout() {
       localStorage.removeItem("loginUser");
       window.location.href = "index.html";
@@ -137,4 +147,3 @@
   </script>
 </body>
 </html>
-
