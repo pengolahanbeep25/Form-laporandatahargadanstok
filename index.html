@@ -1,159 +1,176 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Sistem Dinas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Sistem Dinas</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
 
     body {
-      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
+      background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
+                  no-repeat center center fixed;
       background-size: cover;
       display: flex;
+      flex-direction: column;
       min-height: 100vh;
+    }
+
+    header {
+      background: rgba(21, 71, 52, 0.95);
+      color: white;
+      padding: 18px 0;
+      text-align: center;
+      font-weight: 700;
       backdrop-filter: blur(3px);
     }
 
-    .sidebar {
-      width: 250px;
-      background: rgba(21, 71, 52, 0.92);
-      padding: 25px 0;
-      color: white;
-      backdrop-filter: blur(4px);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 35px;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .menu a {
-      padding: 14px 25px;
+    header small {
       display: block;
-      color: #fff;
-      text-decoration: none;
-      font-size: 15px;
-      transition: 0.25s;
+      font-weight: normal;
+      font-size: 0.9em;
+      margin-top: 3px;
     }
 
-    .menu a:hover, .menu a.active {
-      background: rgba(255,255,255,0.2);
-      border-left: 4px solid #fff;
-    }
-
-    .main {
+    main {
       flex: 1;
-      padding: 25px;
-      overflow-y: auto;
-    }
-
-    .topbar {
-      background: rgba(255,255,255,0.9);
-      padding: 15px 22px;
-      border-radius: 12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      margin-bottom: 25px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      backdrop-filter: blur(6px);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-      margin-bottom: 25px;
+      padding: 40px 15px;
     }
 
     .card {
-      background: rgba(255,255,255,0.88);
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      backdrop-filter: blur(6px);
-    }
-
-    .table-box {
-      margin-top: 22px;
-      background: rgba(255,255,255,0.90);
-      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 35px 50px;
       border-radius: 15px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+      max-width: 420px;
+      width: 100%;
       backdrop-filter: blur(6px);
     }
 
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid #ccc; padding: 10px; font-size: 14px; }
-    th { background: rgba(0,0,0,0.05); text-align: left; }
-
-    .logout {
-      cursor: pointer;
-      background: #b02a37;
-      padding: 6px 12px;
-      border-radius: 6px;
-      color: #fff;
-      font-size: 14px;
-      border: none;
+    h2 {
+      color: #154734;
+      font-size: 1.4em;
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 750px) {
-      .sidebar { display: none; }
+    p {
+      font-size: 0.95em;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #196d3f;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #1e8c51;
+    }
+
+    .error {
+      color: #b02a37;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85em;
+      color: #fff;
+      padding: 12px;
+      background: rgba(21, 71, 52, 0.85);
+      backdrop-filter: blur(3px);
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>DASHBOARD</h2>
-    <div class="menu">
-      <a class="active">Dashboard</a>
-      <a>Data Gudang / Penggilingan</a>
-      <a>Data Alsintan</a>
-      <a>Data Harga</a>
-      <a>Laporan</a>
-      <a>Pengaturan</a>
-      <a onclick="logout()">Logout</a>
-    </div>
-  </div>
+  <header>
+    DINAS PERTANIAN DAN PANGAN KABUPATEN INHIL
+    <small>Sistem Laporan Stok, Produksi, dan Harga Gabah/Beras</small>
+  </header>
 
-  <div class="main">
-    <div class="topbar">
-      <h3 id="welcomeText">Selamat datang</h3>
-      <button class="logout" onclick="logout()">Logout</button>
+  <main>
+    <div class="card">
+      <h2>Login Sistem</h2>
+      <p>Masukkan username dan password Anda.</p>
+      <input type="text" id="username" placeholder="Username" autocomplete="off">
+      <input type="password" id="password" placeholder="Password" autocomplete="off">
+      <button onclick="login()">Masuk</button>
+      <div class="error" id="errorMsg"></div>
     </div>
+  </main>
 
-    <div class="cards">
-      <div class="card"><h4>Produksi</h4><p>12.540 Ton</p></div>
-      <div class="card"><h4>Stok Gudang</h4><p>4.320 Ton</p></div>
-      <div class="card"><h4>Harga Gabah</h4><p>Rp 6.450/kg</p></div>
-      <div class="card"><h4>Transaksi</h4><p>164 Data</p></div>
-    </div>
-
-    <div class="table-box">
-      <h3>Data Terbaru</h3><br>
-      <table>
-        <tr><th>Tanggal</th><th>Desa</th><th>Produksi</th><th>Harga</th></tr>
-        <tr><td>03 Des 2025</td><td>Sungai Dusun</td><td>18 Ton</td><td>Rp 6.300</td></tr>
-        <tr><td>02 Des 2025</td><td>Teluk Kiambang</td><td>12 Ton</td><td>Rp 6.350</td></tr>
-        <tr><td>01 Des 2025</td><td>Tempuling</td><td>15 Ton</td><td>Rp 6.280</td></tr>
-      </table>
-    </div>
-  </div>
+  <footer>
+    © 2025 Dinas Pertanian dan Pangan Kabupaten Indragiri Hilir
+  </footer>
 
   <script>
-    const user = localStorage.getItem("loginUser") || "Pengguna";
-    document.getElementById("welcomeText").innerHTML = `Selamat datang, <b>${user.toUpperCase()}</b>`;
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const msg = document.getElementById("errorMsg");
 
-    function logout() {
-      localStorage.removeItem("loginUser");
-      window.location.href = "index.html";
+      if (!user || !pass) {
+        msg.textContent = "Harap isi username dan password.";
+        return;
+      }
+
+      // daftar akun (bisa tambah sesuai kebutuhan)
+      const akun = {
+        kabidtph: "12345",
+        kabidkdp: "12345",
+        kadis: "123",
+        petani: "123"
+      };
+
+      if (akun[user] && akun[user] === pass) {
+        localStorage.setItem("loginUser", user);
+
+        // arahkan berdasarkan user
+        if (user === "kadis" || user === "kabidtph" || user === "kabidkdp") {
+          window.location.href = "dashboad.html";
+        } else if (user === "petani") {
+          window.location.href = "form.html";
+        } else {
+          msg.textContent = "Akun tidak dikenali.";
+        }
+      } else {
+        msg.textContent = "Username atau password salah.";
+      }
     }
+
+    // tekan Enter untuk login
+    document.addEventListener("keypress", e => {
+      if (e.key === "Enter") login();
+    });
   </script>
 </body>
 </html>
