@@ -147,127 +147,141 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <script>
-    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
-    let allData = [];
+<script>
+  const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+  let allData = [];
 
-    async function loadData() {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        allData = data;
-        populateFilters(data);
-        renderTable();
-      } catch (err) {
-        document.getElementById("data-container").innerHTML = "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
-      }
+  async function loadData() {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      allData = data;
+      populateFilters(data);
+      renderTable();
+    } catch (err) {
+      document.getElementById("data-container").innerHTML = "<p style='color:red'>❌ Gagal memuat data: " + err + "</p>";
     }
+  }
 
-    function getNamaBulan(dateStr) {
-      const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-      const d = new Date(dateStr);
-      if (isNaN(d)) return "Tidak diketahui";
-      return bulan[d.getMonth()] + " " + d.getFullYear();
-    }
+  function getNamaBulan(dateStr) {
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "Tidak diketahui";
+    return bulan[d.getMonth()] + " " + d.getFullYear();
+  }
 
-    function populateFilters(data) {
-      const rows = data.slice(1);
-      const bulanSet = new Set();
-      const penggilinganSet = new Set();
-      rows.forEach(r => {
-        const bulan = getNamaBulan(r[0]);
-        bulanSet.add(bulan);
-        penggilinganSet.add(r[1]);
-      });
+  function populateFilters(data) {
+    const rows = data.slice(1);
+    const bulanSet = new Set();
+    const penggilinganSet = new Set();
+    rows.forEach(r => {
+      const bulan = getNamaBulan(r[0]);
+      bulanSet.add(bulan);
+      penggilinganSet.add(r[1]);
+    });
 
-      const bulanSelect = document.getElementById("filterBulan");
-      bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
-      bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
+    const bulanSelect = document.getElementById("filterBulan");
+    bulanSelect.innerHTML = `<option value="">🗓️ Semua Bulan</option>`;
+    bulanSet.forEach(b => bulanSelect.innerHTML += `<option value="${b}">${b}</option>`);
 
-      const penggSelect = document.getElementById("filterPenggilingan");
-      penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
-      penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
-    }
+    const penggSelect = document.getElementById("filterPenggilingan");
+    penggSelect.innerHTML = `<option value="">🏭 Semua Penggilingan</option>`;
+    penggilinganSet.forEach(p => penggSelect.innerHTML += `<option value="${p}">${p}</option>`);
+  }
 
-    function getFilteredRows() {
-      const rows = allData.slice(1);
-      const searchValue = document.getElementById("search").value.toLowerCase();
-      const selectedBulan = document.getElementById("filterBulan").value;
-      const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
+  function getFilteredRows() {
+    const rows = allData.slice(1);
+    const searchValue = document.getElementById("search").value.toLowerCase();
+    const selectedBulan = document.getElementById("filterBulan").value;
+    const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
 
-      return rows.filter(row => {
-        const bulan = getNamaBulan(row[0]);
-        const penggilingan = row[1];
-        const cocokBulan = !selectedBulan || bulan === selectedBulan;
-        const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
-        const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
-        return cocokBulan && cocokPenggilingan && cocokSearch;
-      });
-    }
+    return rows.filter(row => {
+      const bulan = getNamaBulan(row[0]);
+      const penggilingan = row[1];
+      const cocokBulan = !selectedBulan || bulan === selectedBulan;
+      const cocokPenggilingan = !selectedPenggilingan || penggilingan === selectedPenggilingan;
+      const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
+      return cocokBulan && cocokPenggilingan && cocokSearch;
+    });
+  }
 
-    function renderTable() {
-      if (allData.length === 0) return;
-      const header = allData[0];
-      const rows = getFilteredRows();
-      let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
-      rows.forEach((row, i) => {
-        html += "<tr>";
-        row.forEach(cell => html += `<td>${cell}</td>`);
-        html += `<td><button class="btn-danger" onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
-      });
-      html += "</table>";
-      document.getElementById("data-container").innerHTML = html;
+  // 👉 Fungsi anti duplikat seperti di Apps Script
+  function sumUnique(rows, index) {
+    const seen = new Set();
+    let total = 0;
+    rows.forEach(r => {
+      const val = Number(r[index]) || 0;
+      if (seen.has(val)) return;
+      seen.add(val);
+      total += val;
+    });
+    return total;
+  }
 
-      let totalGKP = 0, totalGKG = 0, totalBeras = 0, totalProduksi = 0;
-      rows.forEach(r => {
-        totalGKP += parseFloat(r[4]) || 0;
-        totalGKG += parseFloat(r[8]) || 0;
-        totalBeras += parseFloat(r[12]) || 0;
-        totalProduksi += parseFloat(r[17]) || 0;
-      });
-      const ton = n => (n / 1000).toFixed(2);
-      document.getElementById("total-container").innerHTML =
-        rows.length > 0
-        ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton`
-        : "";
-    }
+  function renderTable() {
+    if (allData.length === 0) return;
+    const header = allData[0];
+    const rows = getFilteredRows();
+    let html = `<table><tr>${header.map(h => `<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
+    rows.forEach((row, i) => {
+      html += "<tr>";
+      row.forEach(cell => html += `<td>${cell}</td>`);
+      html += `<td><button class="btn-danger" onclick="hapusData(${i + 2})">Hapus</button></td></tr>`;
+    });
+    html += "</table>";
+    document.getElementById("data-container").innerHTML = html;
 
-    async function hapusData(row) {
-      if (!confirm("Yakin ingin menghapus baris ini?")) return;
-      const formData = new FormData();
-      formData.append("action", "hapus");
-      formData.append("row", row);
-      await fetch(url, { method: "POST", body: formData });
-      loadData();
-    }
+    // 👉 TOTAL versi anti-duplikat
+    const totalGKP = sumUnique(rows, 4);
+    const totalGKG = sumUnique(rows, 8);
+    const totalBeras = sumUnique(rows, 12);
+    const totalProduksi = sumUnique(rows, 17);
 
-    function printTable() { window.print(); }
+    const ton = n => (n / 1000).toFixed(2);
+    document.getElementById("total-container").innerHTML =
+      rows.length > 0
+      ? `Total Produksi Beras: ${ton(totalProduksi)} Ton | Total Stok GKP: ${ton(totalGKP)} Ton | Total Stok GKG: ${ton(totalGKG)} Ton | Total Stok Beras: ${ton(totalBeras)} Ton`
+      : "";
+  }
 
-    function downloadExcel() {
-      const rows = getFilteredRows();
-      const header = allData[0];
-      const data = [header, ...rows];
-      const ws = XLSX.utils.aoa_to_sheet(data);
-
-      const total = [
-        [],
-        [`Total Produksi Beras: ${(rows.reduce((a,r)=>a+(parseFloat(r[17])||0),0)/1000).toFixed(2)} Ton`],
-        [`Total Stok GKP: ${(rows.reduce((a,r)=>a+(parseFloat(r[4])||0),0)/1000).toFixed(2)} Ton`],
-        [`Total Stok GKG: ${(rows.reduce((a,r)=>a+(parseFloat(r[8])||0),0)/1000).toFixed(2)} Ton`],
-        [`Total Stok Beras: ${(rows.reduce((a,r)=>a+(parseFloat(r[12])||0),0)/1000).toFixed(2)} Ton`],
-      ];
-      XLSX.utils.sheet_add_aoa(ws, total, { origin: -1 });
-
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-      XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
-    }
-
-    document.getElementById("filterBulan").addEventListener("change", renderTable);
-    document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
-    document.getElementById("search").addEventListener("input", renderTable);
+  async function hapusData(row) {
+    if (!confirm("Yakin ingin menghapus baris ini?")) return;
+    const formData = new FormData();
+    formData.append("action", "hapus");
+    formData.append("row", row);
+    await fetch(url, { method: "POST", body: formData });
     loadData();
-  </script>
+  }
+
+  function printTable() { window.print(); }
+
+  // 👉 Excel export pakai sumUnique (anti duplikat)
+  function downloadExcel() {
+    const rows = getFilteredRows();
+    const header = allData[0];
+    const data = [header, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    const total = [
+      [],
+      [`Total Produksi Beras: ${(sumUnique(rows,17) / 1000).toFixed(2)} Ton`],
+      [`Total Stok GKP: ${(sumUnique(rows,4) / 1000).toFixed(2)} Ton`],
+      [`Total Stok GKG: ${(sumUnique(rows,8) / 1000).toFixed(2)} Ton`],
+      [`Total Stok Beras: ${(sumUnique(rows,12) / 1000).toFixed(2)} Ton`],
+    ];
+    XLSX.utils.sheet_add_aoa(ws, total, { origin: -1 });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+    XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
+  }
+
+  document.getElementById("filterBulan").addEventListener("change", renderTable);
+  document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
+  document.getElementById("search").addEventListener("input", renderTable);
+  loadData();
+</script>
 </body>
 </html>
+
 
